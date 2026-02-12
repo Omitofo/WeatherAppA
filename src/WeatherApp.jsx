@@ -1,3 +1,4 @@
+//src/WeatherApp.jsx
 import React, { useState, useEffect } from 'react';
 
 // Aesthetic Direction: Retro-Futuristic Terminal with Color Customization
@@ -87,7 +88,8 @@ const WeatherApp = () => {
       color: themeColor,
       padding: '2rem',
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      borderRadius: '25px'
     }}>
       {/* Scanline effect */}
       <div style={{
