@@ -112,7 +112,7 @@ export default async function handler(req, res) {
   // ── CORS ──────────────────────────────────
   // In production, set ALLOWED_ORIGIN to your exact domain (e.g. https://myapp.vercel.app)
   // Wildcard '*' is fine during development but restricts credentialed requests.
-  const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
+  const allowedOrigin = process.env.ALLOWED_ORIGIN;
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
