@@ -1,4 +1,3 @@
-//src/WeatherApp.jsx
 import React, { useState, useEffect } from 'react';
 
 // Aesthetic Direction: Retro-Futuristic Terminal with Color Customization
@@ -34,7 +33,7 @@ const WeatherApp = () => {
     
     try {
       // Using Vercel serverless function to keep API key secure
-      const response = await fetch(`/api/Weather?city=${encodeURIComponent(location)}`);
+      const response = await fetch(`/api/weather?city=${encodeURIComponent(location)}`);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -156,19 +155,14 @@ const WeatherApp = () => {
             </div>
 
             {/* Color Theme Selector */}
-            <div style={{
+            <div className="theme-selector" style={{
               display: 'flex',
               flexDirection: 'column',
               gap: '0.5rem',
               alignItems: 'flex-end'
             }}>
-              <div style={{
-                fontSize: '0.7rem',
-                opacity: 0.6
-              }}>
-                {'>'} COLOR MODE:
-              </div>
-              <div style={{
+
+              <div className="theme-buttons" style={{
                 display: 'flex',
                 gap: '0.5rem',
                 flexWrap: 'wrap',
@@ -512,6 +506,16 @@ const WeatherApp = () => {
 
         ::placeholder {
           color: ${hexToRgba(themeColor, 0.3)};
+        }
+
+        @media (max-width: 540px) {
+          .theme-selector {
+            align-items: center !important;
+            width: 100%;
+          }
+          .theme-buttons {
+            justify-content: center !important;
+          }
         }
       `}</style>
     </div>
