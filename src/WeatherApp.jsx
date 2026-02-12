@@ -1,3 +1,5 @@
+//src/WeatherApp.jsx
+
 import React, { useState, useEffect } from 'react';
 
 // Aesthetic Direction: Retro-Futuristic Terminal with Color Customization
@@ -33,7 +35,7 @@ const WeatherApp = () => {
     
     try {
       // Using Vercel serverless function to keep API key secure
-      const response = await fetch(`/api/weather?city=${encodeURIComponent(location)}`);
+      const response = await fetch(`/api/Weather?city=${encodeURIComponent(location)}`);
       
       if (!response.ok) {
         const errorData = await response.json();
