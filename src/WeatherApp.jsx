@@ -412,7 +412,7 @@ const WeatherApp = () => {
                 background: `linear-gradient(90deg, ${themeColor}, ${hexToRgba(themeColor, 0.5)})`
               }} />
 
-              <div style={{
+              <div className="location-name" style={{
                 fontSize: '1.5rem',
                 color: '#1f2937',
                 fontWeight: 'bold'
@@ -533,7 +533,7 @@ const WeatherApp = () => {
                 paddingTop: '1rem',
                 borderTop: `1px solid ${hexToRgba(themeColor, 0.2)}`
               }}>
-                <div>
+                <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
                     FEELS LIKE
                   </div>
@@ -541,7 +541,7 @@ const WeatherApp = () => {
                     {Math.round(weather.main.feels_like)}°C
                   </div>
                 </div>
-                <div>
+                <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
                     HUMIDITY
                   </div>
@@ -964,35 +964,35 @@ const WeatherApp = () => {
         }
 
         /* Wind Speed Animations */
-        /* Calm: 0-2 m/s - Points right but hanging down at 240 degrees */
+        /* Calm: 0-2 m/s - Hangs down-left at 240 degrees (bottom-left, droopy) */
         .wind-calm .windsock-cone {
           border-left-width: 25px;
           opacity: 0.5;
           animation: windCalm 4s ease-in-out infinite;
         }
 
-        /* Light: 2-5 m/s - Points right, less droopy at 210 degrees */
+        /* Light: 2-5 m/s - Down-left at 210 degrees (lifting slightly) */
         .wind-light .windsock-cone {
           border-left-width: 30px;
           opacity: 0.65;
           animation: windLight 2.5s ease-in-out infinite;
         }
 
-        /* Moderate: 5-10 m/s - Points right, slight drop at 190 degrees */
+        /* Moderate: 5-10 m/s - Slightly below horizontal left at 190 degrees */
         .wind-moderate .windsock-cone {
           border-left-width: 38px;
           opacity: 0.8;
           animation: windModerate 1.8s ease-in-out infinite;
         }
 
-        /* Strong: 10-15 m/s - Fully horizontal to the right at 180 degrees */
+        /* Strong: 10-15 m/s - Horizontal to the left at 180 degrees */
         .wind-strong .windsock-cone {
           border-left-width: 45px;
           opacity: 0.95;
           animation: windStrong 1.2s ease-in-out infinite;
         }
 
-        /* Gale: 15+ m/s - Fully horizontal at 180 degrees but violent movement */
+        /* Gale: 15+ m/s - Horizontal to the left at 180 degrees with violent movement */
         .wind-gale .windsock-cone {
           border-left-width: 50px;
           opacity: 1;
@@ -1000,34 +1000,34 @@ const WeatherApp = () => {
         }
 
         @keyframes windCalm {
-          0%, 100% { transform: rotate(242deg) scaleX(0.8); }
-          50% { transform: rotate(238deg) scaleX(0.85); }
+          0%, 100% { transform: rotate(-60deg) scaleX(0.8); }
+          50% { transform: rotate(-56deg) scaleX(0.85); }
         }
 
         @keyframes windLight {
-          0%, 100% { transform: rotate(212deg) scaleX(0.9); }
-          50% { transform: rotate(208deg) scaleX(0.95); }
+          0%, 100% { transform: rotate(-30deg) scaleX(0.9); }
+          50% { transform: rotate(-26deg) scaleX(0.95); }
         }
 
         @keyframes windModerate {
-          0%, 100% { transform: rotate(192deg) scaleX(1); }
-          50% { transform: rotate(188deg) scaleX(1.05); }
+          0%, 100% { transform: rotate(-10deg) scaleX(1); }
+          50% { transform: rotate(-6deg) scaleX(1.05); }
         }
 
         @keyframes windStrong {
-          0%, 100% { transform: rotate(182deg) scaleX(1.08); }
-          25% { transform: rotate(178deg) scaleX(1.12); }
-          50% { transform: rotate(182deg) scaleX(1.08); }
-          75% { transform: rotate(178deg) scaleX(1.12); }
+          0%, 100% { transform: rotate(2deg) scaleX(1.08); }
+          25% { transform: rotate(-2deg) scaleX(1.12); }
+          50% { transform: rotate(2deg) scaleX(1.08); }
+          75% { transform: rotate(-2deg) scaleX(1.12); }
         }
 
         @keyframes windGale {
-          0% { transform: rotate(180deg) scaleX(1.15); }
-          20% { transform: rotate(175deg) scaleX(1.2); }
-          40% { transform: rotate(185deg) scaleX(1.18); }
-          60% { transform: rotate(177deg) scaleX(1.2); }
-          80% { transform: rotate(183deg) scaleX(1.18); }
-          100% { transform: rotate(180deg) scaleX(1.15); }
+          0% { transform: rotate(0deg) scaleX(1.15); }
+          20% { transform: rotate(-5deg) scaleX(1.2); }
+          40% { transform: rotate(5deg) scaleX(1.18); }
+          60% { transform: rotate(-3deg) scaleX(1.2); }
+          80% { transform: rotate(3deg) scaleX(1.18); }
+          100% { transform: rotate(0deg) scaleX(1.15); }
         }
 
         /* General Animations */
@@ -1081,6 +1081,11 @@ const WeatherApp = () => {
           }
           h1 {
             font-size: 1.4rem !important;
+          }
+          
+          /* Center location name on mobile */
+          .location-name {
+            text-align: center !important;
           }
           
           /* Switch to single column layout on mobile */
