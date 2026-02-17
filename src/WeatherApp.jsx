@@ -964,35 +964,35 @@ const WeatherApp = () => {
         }
 
         /* Wind Speed Animations */
-        /* Calm: 0-2 m/s - Hangs down-left at 7-8 o'clock (210-240 degrees) */
+        /* Calm: 0-2 m/s - Points right but hanging down at 240 degrees */
         .wind-calm .windsock-cone {
           border-left-width: 25px;
           opacity: 0.5;
           animation: windCalm 4s ease-in-out infinite;
         }
 
-        /* Light: 2-5 m/s - Down-left at 5-6 o'clock (150-180 degrees) */
+        /* Light: 2-5 m/s - Points right, less droopy at 210 degrees */
         .wind-light .windsock-cone {
           border-left-width: 30px;
           opacity: 0.65;
           animation: windLight 2.5s ease-in-out infinite;
         }
 
-        /* Moderate: 5-10 m/s - Diagonal down at 4-5 o'clock (120-150 degrees) */
+        /* Moderate: 5-10 m/s - Points right, slight drop at 190 degrees */
         .wind-moderate .windsock-cone {
           border-left-width: 38px;
           opacity: 0.8;
           animation: windModerate 1.8s ease-in-out infinite;
         }
 
-        /* Strong: 10-15 m/s - Nearly horizontal at 3:30 (100-110 degrees) */
+        /* Strong: 10-15 m/s - Fully horizontal to the right at 180 degrees */
         .wind-strong .windsock-cone {
           border-left-width: 45px;
           opacity: 0.95;
           animation: windStrong 1.2s ease-in-out infinite;
         }
 
-        /* Gale: 15+ m/s - Fully horizontal at 3 o'clock (90 degrees / 0 in our coordinate) */
+        /* Gale: 15+ m/s - Fully horizontal at 180 degrees but violent movement */
         .wind-gale .windsock-cone {
           border-left-width: 50px;
           opacity: 1;
@@ -1000,34 +1000,34 @@ const WeatherApp = () => {
         }
 
         @keyframes windCalm {
-          0%, 100% { transform: rotate(230deg) scaleX(0.8); }
-          50% { transform: rotate(220deg) scaleX(0.85); }
+          0%, 100% { transform: rotate(242deg) scaleX(0.8); }
+          50% { transform: rotate(238deg) scaleX(0.85); }
         }
 
         @keyframes windLight {
-          0%, 100% { transform: rotate(170deg) scaleX(0.9); }
-          50% { transform: rotate(160deg) scaleX(0.95); }
+          0%, 100% { transform: rotate(212deg) scaleX(0.9); }
+          50% { transform: rotate(208deg) scaleX(0.95); }
         }
 
         @keyframes windModerate {
-          0%, 100% { transform: rotate(140deg) scaleX(1); }
-          50% { transform: rotate(130deg) scaleX(1.05); }
+          0%, 100% { transform: rotate(192deg) scaleX(1); }
+          50% { transform: rotate(188deg) scaleX(1.05); }
         }
 
         @keyframes windStrong {
-          0%, 100% { transform: rotate(108deg) scaleX(1.08); }
-          25% { transform: rotate(102deg) scaleX(1.12); }
-          50% { transform: rotate(108deg) scaleX(1.08); }
-          75% { transform: rotate(102deg) scaleX(1.12); }
+          0%, 100% { transform: rotate(182deg) scaleX(1.08); }
+          25% { transform: rotate(178deg) scaleX(1.12); }
+          50% { transform: rotate(182deg) scaleX(1.08); }
+          75% { transform: rotate(178deg) scaleX(1.12); }
         }
 
         @keyframes windGale {
-          0% { transform: rotate(90deg) scaleX(1.15); }
-          20% { transform: rotate(85deg) scaleX(1.2); }
-          40% { transform: rotate(95deg) scaleX(1.18); }
-          60% { transform: rotate(87deg) scaleX(1.2); }
-          80% { transform: rotate(93deg) scaleX(1.18); }
-          100% { transform: rotate(90deg) scaleX(1.15); }
+          0% { transform: rotate(180deg) scaleX(1.15); }
+          20% { transform: rotate(175deg) scaleX(1.2); }
+          40% { transform: rotate(185deg) scaleX(1.18); }
+          60% { transform: rotate(177deg) scaleX(1.2); }
+          80% { transform: rotate(183deg) scaleX(1.18); }
+          100% { transform: rotate(180deg) scaleX(1.15); }
         }
 
         /* General Animations */
