@@ -100,9 +100,11 @@ const WeatherApp = () => {
       }} />
 
       <div style={{
-        maxWidth: '1400px',
+        width: '100%',
+        maxWidth: '1600px',
         margin: '0 auto',
-        position: 'relative'
+        position: 'relative',
+        padding: '0 1rem'
       }}>
         {/* Header */}
         <div style={{
@@ -544,7 +546,8 @@ const WeatherApp = () => {
             <div style={{ 
               fontSize: '4rem', 
               marginBottom: '1rem',
-              opacity: 0.3,
+              color: themeColor,
+              opacity: 0.4,
               animation: 'pulse 2s ease-in-out infinite'
             }}>
               ▒▒▒
@@ -573,8 +576,8 @@ const WeatherApp = () => {
         }
 
         @keyframes pulse {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 0.4; }
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.6; }
         }
 
         ::placeholder {
