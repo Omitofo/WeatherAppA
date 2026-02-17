@@ -1,3 +1,4 @@
+//src/App.jsx
 import { useState } from 'react'
 import './App.css'
 import WeatherApp from './WeatherApp'

@@ -1,6 +1,5 @@
 // api/weather.js
 // Vercel Serverless Function: secure weather API with rate limiting & caching
-
 // ─────────────────────────────────────────────
 // CONFIG
 // ─────────────────────────────────────────────
