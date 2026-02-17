@@ -184,7 +184,7 @@ const WeatherApp = () => {
           }}>
             <div>
               <h1 style={{
-                fontSize: '1.5rem',
+                fontSize: '1.75rem',
                 margin: 0,
                 color: themeColor,
                 textShadow: `0 0 20px ${hexToRgba(themeColor, 0.4)}`,
@@ -195,7 +195,7 @@ const WeatherApp = () => {
                 WEATHER.SYS
               </h1>
               <div style={{
-                fontSize: '0.65rem',
+                fontSize: '0.75rem',
                 color: '#6b7280',
                 marginTop: '0.25rem'
               }}>
@@ -255,7 +255,7 @@ const WeatherApp = () => {
 
               {/* Time display */}
               <div style={{
-                fontSize: '0.85rem',
+                fontSize: '0.95rem',
                 color: themeColor,
                 fontWeight: 'bold',
                 padding: '0.4rem 0.9rem',
@@ -280,7 +280,7 @@ const WeatherApp = () => {
           border: '1px solid rgba(0, 0, 0, 0.06)'
         }}>
           <div style={{
-            fontSize: '0.75rem',
+            fontSize: '0.85rem',
             marginBottom: '0.6rem',
             color: '#4b5563',
             fontWeight: '600'
@@ -305,7 +305,7 @@ const WeatherApp = () => {
                 color: '#1a1f3a',
                 padding: '0.75rem 1.1rem',
                 fontFamily: 'inherit',
-                fontSize: '0.9rem',
+                fontSize: '1rem',
                 outline: 'none',
                 borderRadius: '8px',
                 transition: 'all 0.3s ease'
@@ -328,7 +328,7 @@ const WeatherApp = () => {
                 color: 'white',
                 padding: '0.75rem 1.75rem',
                 fontFamily: 'inherit',
-                fontSize: '0.9rem',
+                fontSize: '1rem',
                 fontWeight: 'bold',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 borderRadius: '8px',
@@ -363,7 +363,7 @@ const WeatherApp = () => {
             marginBottom: '1.5rem',
             borderRadius: '8px',
             fontWeight: '600',
-            fontSize: '0.85rem'
+            fontSize: '0.95rem'
           }}>
             {'>'} ERROR: {error.toUpperCase()}
           </div>
@@ -385,7 +385,7 @@ const WeatherApp = () => {
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(10px)',
               borderRadius: '16px',
-              padding: '2rem',
+              padding: '1.5rem',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
               border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
               position: 'relative',
@@ -405,9 +405,9 @@ const WeatherApp = () => {
               }} />
 
               <div style={{
-                fontSize: '0.8rem',
+                fontSize: '0.85rem',
                 color: '#6b7280',
-                marginBottom: '1.5rem',
+                marginBottom: '1rem',
                 fontWeight: '600'
               }}>
                 LOCATION: {weather.name.toUpperCase()}, {weather.sys.country}
@@ -418,7 +418,7 @@ const WeatherApp = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '2rem',
-                marginBottom: '2rem'
+                marginBottom: '1.5rem'
               }}>
                 {/* Animated Weather Icon with better contrast */}
                 <div style={{
@@ -431,7 +431,7 @@ const WeatherApp = () => {
                   {getWeatherIcon(weather.weather[0].main)}
                 </div>
 
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, textAlign: 'center' }}>
                   <div style={{
                     fontSize: '4.5rem',
                     fontWeight: 'bold',
@@ -442,7 +442,7 @@ const WeatherApp = () => {
                     {Math.round(weather.main.temp)}°
                   </div>
                   <div style={{
-                    fontSize: '1.1rem',
+                    fontSize: '1.2rem',
                     color: '#4b5563',
                     marginTop: '0.5rem',
                     textTransform: 'uppercase',
@@ -458,22 +458,22 @@ const WeatherApp = () => {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: '1rem',
-                paddingTop: '1.5rem',
+                paddingTop: '1rem',
                 borderTop: `1px solid ${hexToRgba(themeColor, 0.2)}`
               }}>
                 <div>
-                  <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
                     FEELS LIKE
                   </div>
-                  <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#1a1f3a' }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {Math.round(weather.main.feels_like)}°C
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
                     HUMIDITY
                   </div>
-                  <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#1a1f3a' }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {weather.main.humidity}%
                   </div>
                 </div>
@@ -492,7 +492,7 @@ const WeatherApp = () => {
               border: '1px solid rgba(0, 0, 0, 0.06)'
             }}>
               <div style={{
-                fontSize: '0.75rem',
+                fontSize: '0.85rem',
                 color: '#6b7280',
                 marginBottom: '1rem',
                 fontWeight: '600'
@@ -534,7 +534,7 @@ const WeatherApp = () => {
                     }}
                   >
                     <div style={{
-                      fontSize: '0.6rem',
+                      fontSize: '0.7rem',
                       color: '#9ca3af',
                       marginBottom: '0.4rem',
                       fontWeight: '600'
@@ -542,7 +542,7 @@ const WeatherApp = () => {
                       {item.label}
                     </div>
                     <div style={{
-                      fontSize: '1.3rem',
+                      fontSize: '1.4rem',
                       fontWeight: 'bold',
                       color: '#1a1f3a',
                       display: 'flex',
@@ -550,7 +550,7 @@ const WeatherApp = () => {
                       gap: '0.2rem'
                     }}>
                       <span>{item.value}</span>
-                      <span style={{ fontSize: '0.7rem', color: '#6b7280' }}>{item.unit}</span>
+                      <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{item.unit}</span>
                     </div>
                   </div>
                 ))}
@@ -568,7 +568,7 @@ const WeatherApp = () => {
               boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
               border: '1px solid rgba(0, 0, 0, 0.06)'
             }}>
-              <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem', fontWeight: '600' }}>
+              <div style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1rem', fontWeight: '600' }}>
                 {'>'} SUN DATA
               </div>
               <div style={{
@@ -582,10 +582,10 @@ const WeatherApp = () => {
                   borderRadius: '8px',
                   border: `1px solid ${hexToRgba(themeColor, 0.15)}`
                 }}>
-                  <div style={{ fontSize: '0.6rem', color: '#9ca3af', marginBottom: '0.4rem' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '0.4rem' }}>
                     SUNRISE
                   </div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1a1f3a' }}>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -595,10 +595,10 @@ const WeatherApp = () => {
                   borderRadius: '8px',
                   border: `1px solid ${hexToRgba(themeColor, 0.15)}`
                 }}>
-                  <div style={{ fontSize: '0.6rem', color: '#9ca3af', marginBottom: '0.4rem' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '0.4rem' }}>
                     SUNSET
                   </div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1a1f3a' }}>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -629,7 +629,7 @@ const WeatherApp = () => {
             </div>
             <div style={{ 
               color: '#6b7280',
-              fontSize: '1rem',
+              fontSize: '1.1rem',
               fontWeight: '600'
             }}>
               AWAITING INPUT...
@@ -897,13 +897,13 @@ const WeatherApp = () => {
             grid-column: 1 !important;
           }
           h1 {
-            font-size: 1.25rem !important;
+            font-size: 1.4rem !important;
           }
         }
 
         @media (max-width: 480px) {
           h1 {
-            font-size: 1.1rem !important;
+            font-size: 1.2rem !important;
           }
           .weather-icon-animated {
             width: 100px !important;
