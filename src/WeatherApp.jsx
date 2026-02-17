@@ -53,7 +53,15 @@ const WeatherApp = () => {
     if (e.key === 'Enter') searchWeather();
   };
 
-  // Enhanced animated weather icons with better visibility
+  // Determine wind animation class based on speed (m/s)
+  const getWindClass = (speed) => {
+    if (speed < 2) return 'wind-calm';       // 0-2 m/s: Calm
+    if (speed < 5) return 'wind-light';      // 2-5 m/s: Light breeze
+    if (speed < 10) return 'wind-moderate';  // 5-10 m/s: Moderate
+    if (speed < 15) return 'wind-strong';    // 10-15 m/s: Strong
+    return 'wind-gale';                      // 15+ m/s: Gale
+  };
+
   const getWeatherIcon = (condition) => {
     const iconMap = {
       Clear: (
@@ -413,12 +421,13 @@ const WeatherApp = () => {
                 LOCATION: {weather.name.toUpperCase()}, {weather.sys.country}
               </div>
 
-              <div style={{
+              <div className="temp-display-container" style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '2rem',
-                marginBottom: '1.5rem'
+                marginBottom: '1.5rem',
+                flexWrap: 'wrap'
               }}>
                 {/* Animated Weather Icon with better contrast */}
                 <div style={{
@@ -431,7 +440,8 @@ const WeatherApp = () => {
                   {getWeatherIcon(weather.weather[0].main)}
                 </div>
 
-                <div style={{ flex: 1, textAlign: 'center' }}>
+                {/* Temperature Display */}
+                <div style={{ flex: 1, textAlign: 'center', minWidth: '200px' }}>
                   <div style={{
                     fontSize: '4.5rem',
                     fontWeight: 'bold',
@@ -449,6 +459,59 @@ const WeatherApp = () => {
                     fontWeight: '600'
                   }}>
                     {weather.weather[0].description}
+                  </div>
+                  
+                  {/* Windsock - Mobile Version (shows below temp on mobile) */}
+                  <div className="windsock-mobile" style={{
+                    marginTop: '1rem',
+                    display: 'none'
+                  }}>
+                    <div style={{
+                      background: `linear-gradient(135deg, ${hexToRgba(themeColor, 0.1)}, ${hexToRgba(themeColor, 0.05)})`,
+                      borderRadius: '12px',
+                      padding: '1rem',
+                      border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
+                      display: 'inline-block'
+                    }}>
+                      <div className={`windsock ${getWindClass(weather.wind.speed)}`}>
+                        <div className="windsock-pole"></div>
+                        <div className="windsock-cone"></div>
+                      </div>
+                      <div style={{
+                        fontSize: '0.75rem',
+                        color: '#6b7280',
+                        marginTop: '0.5rem',
+                        fontWeight: '600'
+                      }}>
+                        WIND: {weather.wind.speed} m/s
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Windsock - Desktop Version (shows on right side) */}
+                <div className="windsock-desktop" style={{
+                  background: `linear-gradient(135deg, ${hexToRgba(themeColor, 0.1)}, ${hexToRgba(themeColor, 0.05)})`,
+                  borderRadius: '20px',
+                  padding: '1.5rem',
+                  border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
+                  boxShadow: `0 8px 24px ${hexToRgba(themeColor, 0.2)}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <div className={`windsock ${getWindClass(weather.wind.speed)}`}>
+                    <div className="windsock-pole"></div>
+                    <div className="windsock-cone"></div>
+                  </div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    fontWeight: '600',
+                    textAlign: 'center'
+                  }}>
+                    WIND<br/>{weather.wind.speed} m/s
                   </div>
                 </div>
               </div>
@@ -847,6 +910,108 @@ const WeatherApp = () => {
           50% { transform: translateX(8px) scale(1.1); opacity: 1; }
         }
 
+        /* Windsock Styles */
+        .windsock {
+          position: relative;
+          width: 80px;
+          height: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .windsock-pole {
+          position: absolute;
+          left: 15px;
+          bottom: 10px;
+          width: 3px;
+          height: 50px;
+          background: linear-gradient(180deg, #4b5563 0%, #6b7280 100%);
+          border-radius: 2px;
+        }
+
+        .windsock-pole::before {
+          content: '';
+          position: absolute;
+          top: -4px;
+          left: -3px;
+          width: 9px;
+          height: 9px;
+          background: #374151;
+          border-radius: 50%;
+        }
+
+        .windsock-cone {
+          position: absolute;
+          left: 18px;
+          top: 15px;
+          width: 0;
+          height: 0;
+          border-top: 8px solid transparent;
+          border-bottom: 8px solid transparent;
+          border-left: 45px solid ${themeColor};
+          transform-origin: left center;
+          filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* Wind Speed Animations */
+        .wind-calm .windsock-cone {
+          border-left-width: 30px;
+          opacity: 0.4;
+          animation: windCalm 3s ease-in-out infinite;
+        }
+
+        .wind-light .windsock-cone {
+          border-left-width: 35px;
+          opacity: 0.6;
+          animation: windLight 2s ease-in-out infinite;
+        }
+
+        .wind-moderate .windsock-cone {
+          border-left-width: 40px;
+          opacity: 0.8;
+          animation: windModerate 1.5s ease-in-out infinite;
+        }
+
+        .wind-strong .windsock-cone {
+          border-left-width: 45px;
+          opacity: 0.95;
+          animation: windStrong 1s ease-in-out infinite;
+        }
+
+        .wind-gale .windsock-cone {
+          border-left-width: 50px;
+          opacity: 1;
+          animation: windGale 0.6s ease-in-out infinite;
+        }
+
+        @keyframes windCalm {
+          0%, 100% { transform: rotate(-2deg) scaleX(0.9); }
+          50% { transform: rotate(2deg) scaleX(0.95); }
+        }
+
+        @keyframes windLight {
+          0%, 100% { transform: rotate(-5deg) scaleX(0.95); }
+          50% { transform: rotate(5deg) scaleX(1); }
+        }
+
+        @keyframes windModerate {
+          0%, 100% { transform: rotate(-8deg) scaleX(1); }
+          50% { transform: rotate(8deg) scaleX(1.05); }
+        }
+
+        @keyframes windStrong {
+          0%, 100% { transform: rotate(-12deg) scaleX(1.05); }
+          50% { transform: rotate(12deg) scaleX(1.1); }
+        }
+
+        @keyframes windGale {
+          0%, 100% { transform: rotate(-15deg) scaleX(1.1); }
+          25% { transform: rotate(15deg) scaleX(1.15); }
+          50% { transform: rotate(-15deg) scaleX(1.1); }
+          75% { transform: rotate(15deg) scaleX(1.15); }
+        }
+
         /* General Animations */
         @keyframes fadeIn {
           from {
@@ -899,6 +1064,22 @@ const WeatherApp = () => {
           h1 {
             font-size: 1.4rem !important;
           }
+          
+          /* Hide desktop windsock, show mobile version */
+          .windsock-desktop {
+            display: none !important;
+          }
+          .windsock-mobile {
+            display: block !important;
+          }
+          
+          /* Reduce temperature font size on mobile */
+          .temp-display-container > div:nth-child(2) > div:first-child {
+            font-size: 3.5rem !important;
+          }
+          .temp-display-container > div:nth-child(2) > div:nth-child(2) {
+            font-size: 1rem !important;
+          }
         }
 
         @media (max-width: 480px) {
@@ -911,6 +1092,14 @@ const WeatherApp = () => {
           }
           .sun-core, .rain-cloud, .drizzle-cloud, .storm-cloud, .clouds span {
             font-size: 3.5rem !important;
+          }
+          
+          /* Further reduce temperature on small mobile */
+          .temp-display-container > div:nth-child(2) > div:first-child {
+            font-size: 3rem !important;
+          }
+          .temp-display-container > div:nth-child(2) > div:nth-child(2) {
+            font-size: 0.9rem !important;
           }
         }
 
