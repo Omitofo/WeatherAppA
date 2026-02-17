@@ -416,16 +416,16 @@ const WeatherApp = () => {
                 fontSize: '0.85rem',
                 color: '#6b7280',
                 marginBottom: '1rem',
-                fontWeight: '600'
+                fontWeight: 'bold'
               }}>
-                LOCATION: {weather.name.toUpperCase()}, {weather.sys.country}
+                <span style={{ fontWeight: 'bold' }}>LOCATION:</span> {weather.name.toUpperCase()}, {weather.sys.country}
               </div>
 
               <div className="temp-display-container" style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '2rem',
+                gap: '1rem',
                 marginBottom: '1.5rem',
                 flexWrap: 'wrap'
               }}>
@@ -955,61 +955,70 @@ const WeatherApp = () => {
         }
 
         /* Wind Speed Animations */
+        /* Calm: 0-2 m/s - Hangs downward at -60 degrees */
         .wind-calm .windsock-cone {
-          border-left-width: 30px;
-          opacity: 0.4;
-          animation: windCalm 3s ease-in-out infinite;
+          border-left-width: 25px;
+          opacity: 0.5;
+          animation: windCalm 4s ease-in-out infinite;
         }
 
+        /* Light: 2-5 m/s - Slight lift to -35 degrees */
         .wind-light .windsock-cone {
-          border-left-width: 35px;
-          opacity: 0.6;
-          animation: windLight 2s ease-in-out infinite;
+          border-left-width: 30px;
+          opacity: 0.65;
+          animation: windLight 2.5s ease-in-out infinite;
         }
 
+        /* Moderate: 5-10 m/s - Moderate lift to -10 degrees */
         .wind-moderate .windsock-cone {
-          border-left-width: 40px;
+          border-left-width: 38px;
           opacity: 0.8;
-          animation: windModerate 1.5s ease-in-out infinite;
+          animation: windModerate 1.8s ease-in-out infinite;
         }
 
+        /* Strong: 10-15 m/s - Nearly horizontal at 5 degrees */
         .wind-strong .windsock-cone {
           border-left-width: 45px;
           opacity: 0.95;
-          animation: windStrong 1s ease-in-out infinite;
+          animation: windStrong 1.2s ease-in-out infinite;
         }
 
+        /* Gale: 15+ m/s - Fully horizontal with violent movement */
         .wind-gale .windsock-cone {
           border-left-width: 50px;
           opacity: 1;
-          animation: windGale 0.6s ease-in-out infinite;
+          animation: windGale 0.5s ease-in-out infinite;
         }
 
         @keyframes windCalm {
-          0%, 100% { transform: rotate(-2deg) scaleX(0.9); }
-          50% { transform: rotate(2deg) scaleX(0.95); }
+          0%, 100% { transform: rotate(-65deg) scaleX(0.8); }
+          50% { transform: rotate(-55deg) scaleX(0.85); }
         }
 
         @keyframes windLight {
-          0%, 100% { transform: rotate(-5deg) scaleX(0.95); }
-          50% { transform: rotate(5deg) scaleX(1); }
+          0%, 100% { transform: rotate(-40deg) scaleX(0.9); }
+          50% { transform: rotate(-30deg) scaleX(0.95); }
         }
 
         @keyframes windModerate {
-          0%, 100% { transform: rotate(-8deg) scaleX(1); }
-          50% { transform: rotate(8deg) scaleX(1.05); }
+          0%, 100% { transform: rotate(-15deg) scaleX(1); }
+          50% { transform: rotate(-5deg) scaleX(1.05); }
         }
 
         @keyframes windStrong {
-          0%, 100% { transform: rotate(-12deg) scaleX(1.05); }
-          50% { transform: rotate(12deg) scaleX(1.1); }
+          0%, 100% { transform: rotate(0deg) scaleX(1.08); }
+          25% { transform: rotate(8deg) scaleX(1.12); }
+          50% { transform: rotate(0deg) scaleX(1.08); }
+          75% { transform: rotate(-8deg) scaleX(1.12); }
         }
 
         @keyframes windGale {
-          0%, 100% { transform: rotate(-15deg) scaleX(1.1); }
-          25% { transform: rotate(15deg) scaleX(1.15); }
-          50% { transform: rotate(-15deg) scaleX(1.1); }
-          75% { transform: rotate(15deg) scaleX(1.15); }
+          0% { transform: rotate(5deg) scaleX(1.15); }
+          20% { transform: rotate(-10deg) scaleX(1.2); }
+          40% { transform: rotate(10deg) scaleX(1.18); }
+          60% { transform: rotate(-8deg) scaleX(1.2); }
+          80% { transform: rotate(8deg) scaleX(1.18); }
+          100% { transform: rotate(5deg) scaleX(1.15); }
         }
 
         /* General Animations */
