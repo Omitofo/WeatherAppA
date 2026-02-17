@@ -1,10 +1,8 @@
 //src/WeatherApp.jsx
-
 import React, { useState, useEffect } from 'react';
 
-// Redesigned: Modern, clean interface with better space utilization
-// Light background with subtle gradients, organized grid layout
-// Responsive: 2-column desktop → 1-column tablet/mobile
+// Enhanced design: 3-column desktop layout, animated weather icons, better contrast
+// Layout: 2/4 main weather (left) | 1/4 metrics (top right) | 1/4 sun data (bottom right)
 
 const WeatherApp = () => {
   const [weather, setWeather] = useState(null);
@@ -55,21 +53,82 @@ const WeatherApp = () => {
     if (e.key === 'Enter') searchWeather();
   };
 
+  // Enhanced animated weather icons with better visibility
   const getWeatherIcon = (condition) => {
-    const icons = {
-      Clear: '☀',
-      Clouds: '☁',
-      Rain: '🌧',
-      Drizzle: '🌦',
-      Thunderstorm: '⛈',
-      Snow: '❄',
-      Mist: '🌫',
-      Smoke: '💨',
-      Haze: '🌫',
-      Dust: '💨',
-      Fog: '🌫',
+    const iconMap = {
+      Clear: (
+        <div className="weather-icon-animated sun">
+          <div className="sun-core">☀️</div>
+          <div className="sun-rays"></div>
+        </div>
+      ),
+      Clouds: (
+        <div className="weather-icon-animated clouds">
+          <span style={{ fontSize: '5rem' }}>☁️</span>
+        </div>
+      ),
+      Rain: (
+        <div className="weather-icon-animated rain">
+          <div className="rain-cloud">☁️</div>
+          <div className="rain-drops">
+            <span>💧</span>
+            <span>💧</span>
+            <span>💧</span>
+          </div>
+        </div>
+      ),
+      Drizzle: (
+        <div className="weather-icon-animated drizzle">
+          <div className="drizzle-cloud">🌦️</div>
+          <div className="drizzle-drops">
+            <span>💧</span>
+            <span>💧</span>
+          </div>
+        </div>
+      ),
+      Thunderstorm: (
+        <div className="weather-icon-animated thunderstorm">
+          <div className="storm-cloud">⛈️</div>
+          <div className="lightning">⚡</div>
+        </div>
+      ),
+      Snow: (
+        <div className="weather-icon-animated snow">
+          <div className="snow-cloud">☁️</div>
+          <div className="snowflakes">
+            <span>❄️</span>
+            <span>❄️</span>
+            <span>❄️</span>
+          </div>
+        </div>
+      ),
+      Mist: (
+        <div className="weather-icon-animated mist">
+          <span style={{ fontSize: '5rem' }}>🌫️</span>
+        </div>
+      ),
+      Smoke: (
+        <div className="weather-icon-animated smoke">
+          <span style={{ fontSize: '5rem' }}>💨</span>
+        </div>
+      ),
+      Haze: (
+        <div className="weather-icon-animated haze">
+          <span style={{ fontSize: '5rem' }}>🌫️</span>
+        </div>
+      ),
+      Dust: (
+        <div className="weather-icon-animated dust">
+          <span style={{ fontSize: '5rem' }}>💨</span>
+        </div>
+      ),
+      Fog: (
+        <div className="weather-icon-animated fog">
+          <span style={{ fontSize: '5rem' }}>🌫️</span>
+        </div>
+      ),
     };
-    return icons[condition] || '🌡';
+    return iconMap[condition] || <span style={{ fontSize: '5rem' }}>🌡️</span>;
   };
 
   const hexToRgba = (hex, alpha) => {
@@ -82,9 +141,10 @@ const WeatherApp = () => {
   return (
     <div style={{
       minHeight: '100vh',
+      width: '100%',
       background: 'linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%)',
       fontFamily: '"Courier New", Courier, monospace',
-      padding: '2rem',
+      padding: '1.5rem',
       position: 'relative'
     }}>
       {/* Subtle texture overlay */}
@@ -103,16 +163,15 @@ const WeatherApp = () => {
         width: '100%',
         maxWidth: '1600px',
         margin: '0 auto',
-        position: 'relative',
-        padding: '0 1rem'
+        position: 'relative'
       }}>
         {/* Header */}
         <div style={{
           background: 'rgba(255, 255, 255, 0.9)',
           backdropFilter: 'blur(10px)',
           borderRadius: '12px',
-          padding: '1.5rem 2rem',
-          marginBottom: '2rem',
+          padding: '1.25rem 1.75rem',
+          marginBottom: '1.5rem',
           boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
           border: '1px solid rgba(0, 0, 0, 0.06)'
         }}>
@@ -125,17 +184,18 @@ const WeatherApp = () => {
           }}>
             <div>
               <h1 style={{
-                fontSize: '2rem',
+                fontSize: '1.5rem',
                 margin: 0,
-                color: '#1a1f3a',
-                textShadow: `0 0 20px ${hexToRgba(themeColor, 0.3)}`,
+                color: themeColor,
+                textShadow: `0 0 20px ${hexToRgba(themeColor, 0.4)}`,
                 letterSpacing: '0.1em',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                transition: 'all 0.3s ease'
               }}>
                 WEATHER.SYS
               </h1>
               <div style={{
-                fontSize: '0.75rem',
+                fontSize: '0.65rem',
                 color: '#6b7280',
                 marginTop: '0.25rem'
               }}>
@@ -168,7 +228,7 @@ const WeatherApp = () => {
                       background: theme.color,
                       cursor: 'pointer',
                       borderRadius: '6px',
-                      fontSize: '0.65rem',
+                      fontSize: '0.6rem',
                       fontWeight: 'bold',
                       color: 'white',
                       transition: 'all 0.2s ease',
@@ -195,10 +255,10 @@ const WeatherApp = () => {
 
               {/* Time display */}
               <div style={{
-                fontSize: '1rem',
+                fontSize: '0.85rem',
                 color: themeColor,
                 fontWeight: 'bold',
-                padding: '0.5rem 1rem',
+                padding: '0.4rem 0.9rem',
                 background: hexToRgba(themeColor, 0.1),
                 borderRadius: '6px',
                 border: `1px solid ${hexToRgba(themeColor, 0.3)}`
@@ -214,14 +274,14 @@ const WeatherApp = () => {
           background: 'rgba(255, 255, 255, 0.9)',
           backdropFilter: 'blur(10px)',
           borderRadius: '12px',
-          padding: '1.5rem 2rem',
-          marginBottom: '2rem',
+          padding: '1.25rem 1.75rem',
+          marginBottom: '1.5rem',
           boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
           border: '1px solid rgba(0, 0, 0, 0.06)'
         }}>
           <div style={{
-            fontSize: '0.85rem',
-            marginBottom: '0.75rem',
+            fontSize: '0.75rem',
+            marginBottom: '0.6rem',
             color: '#4b5563',
             fontWeight: '600'
           }}>
@@ -243,9 +303,9 @@ const WeatherApp = () => {
                 background: 'white',
                 border: `2px solid ${hexToRgba(themeColor, 0.3)}`,
                 color: '#1a1f3a',
-                padding: '0.875rem 1.25rem',
+                padding: '0.75rem 1.1rem',
                 fontFamily: 'inherit',
-                fontSize: '1rem',
+                fontSize: '0.9rem',
                 outline: 'none',
                 borderRadius: '8px',
                 transition: 'all 0.3s ease'
@@ -266,16 +326,16 @@ const WeatherApp = () => {
                 background: themeColor,
                 border: 'none',
                 color: 'white',
-                padding: '0.875rem 2rem',
+                padding: '0.75rem 1.75rem',
                 fontFamily: 'inherit',
-                fontSize: '1rem',
+                fontSize: '0.9rem',
                 fontWeight: 'bold',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 borderRadius: '8px',
                 transition: 'all 0.2s ease',
                 opacity: loading ? 0.6 : 1,
                 boxShadow: `0 4px 12px ${hexToRgba(themeColor, 0.3)}`,
-                minWidth: '140px'
+                minWidth: '130px'
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
@@ -299,233 +359,248 @@ const WeatherApp = () => {
             background: 'rgba(239, 68, 68, 0.1)',
             border: '2px solid #ef4444',
             color: '#dc2626',
-            padding: '1rem 1.5rem',
-            marginBottom: '2rem',
+            padding: '0.9rem 1.25rem',
+            marginBottom: '1.5rem',
             borderRadius: '8px',
-            fontWeight: '600'
+            fontWeight: '600',
+            fontSize: '0.85rem'
           }}>
             {'>'} ERROR: {error.toUpperCase()}
           </div>
         )}
 
-        {/* Weather Display - NEW LAYOUT */}
+        {/* Weather Display - 3 Column Layout */}
         {weather && (
-          <div style={{
+          <div className="weather-layout" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
-            gap: '2rem',
+            gridTemplateColumns: '2fr 1fr 1fr',
+            gridTemplateRows: 'auto auto',
+            gap: '1.5rem',
             animation: 'fadeIn 0.5s ease-out'
           }}>
-            {/* Left Column: Main Weather */}
+            {/* Main Weather Card - Spans 2 rows on left (2/4) */}
             <div style={{
+              gridColumn: '1',
+              gridRow: '1 / 3',
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '16px',
+              padding: '2rem',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+              border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
+              position: 'relative',
+              overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
-              gap: '1.5rem'
+              justifyContent: 'center'
             }}>
-              {/* Hero Card */}
+              {/* Accent gradient */}
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '16px',
-                padding: '2.5rem',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-                border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
-                position: 'relative',
-                overflow: 'hidden'
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
+                background: `linear-gradient(90deg, ${themeColor}, ${hexToRgba(themeColor, 0.5)})`
+              }} />
+
+              <div style={{
+                fontSize: '0.8rem',
+                color: '#6b7280',
+                marginBottom: '1.5rem',
+                fontWeight: '600'
               }}>
-                {/* Accent gradient */}
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '4px',
-                  background: `linear-gradient(90deg, ${themeColor}, ${hexToRgba(themeColor, 0.5)})`
-                }} />
+                LOCATION: {weather.name.toUpperCase()}, {weather.sys.country}
+              </div>
 
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2rem',
+                marginBottom: '2rem'
+              }}>
+                {/* Animated Weather Icon with better contrast */}
                 <div style={{
-                  fontSize: '0.9rem',
-                  color: '#6b7280',
-                  marginBottom: '1.5rem',
-                  fontWeight: '600'
+                  background: `linear-gradient(135deg, ${hexToRgba(themeColor, 0.1)}, ${hexToRgba(themeColor, 0.05)})`,
+                  borderRadius: '20px',
+                  padding: '1.5rem',
+                  border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
+                  boxShadow: `0 8px 24px ${hexToRgba(themeColor, 0.2)}`
                 }}>
-                  LOCATION: {weather.name.toUpperCase()}, {weather.sys.country}
+                  {getWeatherIcon(weather.weather[0].main)}
                 </div>
 
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '2rem',
-                  marginBottom: '1.5rem'
-                }}>
+                <div style={{ flex: 1 }}>
                   <div style={{
-                    fontSize: '6rem',
+                    fontSize: '4.5rem',
+                    fontWeight: 'bold',
                     lineHeight: 1,
-                    filter: `drop-shadow(0 4px 12px ${hexToRgba(themeColor, 0.3)})`
+                    color: '#1a1f3a',
+                    textShadow: `2px 2px 0 ${hexToRgba(themeColor, 0.1)}`
                   }}>
-                    {getWeatherIcon(weather.weather[0].main)}
+                    {Math.round(weather.main.temp)}°
                   </div>
-
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      fontSize: '5rem',
-                      fontWeight: 'bold',
-                      lineHeight: 1,
-                      color: '#1a1f3a',
-                      textShadow: `2px 2px 0 ${hexToRgba(themeColor, 0.1)}`
-                    }}>
-                      {Math.round(weather.main.temp)}°
-                    </div>
-                    <div style={{
-                      fontSize: '1.25rem',
-                      color: '#4b5563',
-                      marginTop: '0.5rem',
-                      textTransform: 'uppercase',
-                      fontWeight: '600'
-                    }}>
-                      {weather.weather[0].description}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick stats */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '1rem',
-                  paddingTop: '1.5rem',
-                  borderTop: `1px solid ${hexToRgba(themeColor, 0.2)}`
-                }}>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
-                      FEELS LIKE
-                    </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a1f3a' }}>
-                      {Math.round(weather.main.feels_like)}°C
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
-                      HUMIDITY
-                    </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a1f3a' }}>
-                      {weather.main.humidity}%
-                    </div>
+                  <div style={{
+                    fontSize: '1.1rem',
+                    color: '#4b5563',
+                    marginTop: '0.5rem',
+                    textTransform: 'uppercase',
+                    fontWeight: '600'
+                  }}>
+                    {weather.weather[0].description}
                   </div>
                 </div>
               </div>
 
-              {/* Sun times */}
+              {/* Quick stats */}
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
-                border: '1px solid rgba(0, 0, 0, 0.06)'
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '1rem',
+                paddingTop: '1.5rem',
+                borderTop: `1px solid ${hexToRgba(themeColor, 0.2)}`
               }}>
-                <div style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1rem', fontWeight: '600' }}>
-                  {'>'} SUN DATA
-                </div>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gap: '1rem'
-                }}>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
-                      SUNRISE
-                    </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1a1f3a' }}>
-                      {new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
+                <div>
+                  <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
+                    FEELS LIKE
                   </div>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
-                      SUNSET
-                    </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1a1f3a' }}>
-                      {new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#1a1f3a' }}>
+                    {Math.round(weather.main.feels_like)}°C
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginBottom: '0.25rem' }}>
+                    HUMIDITY
+                  </div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#1a1f3a' }}>
+                    {weather.main.humidity}%
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Details Grid */}
-            <div>
+            {/* Detailed Metrics - Top right (1/4) */}
+            <div style={{
+              gridColumn: '2 / 4',
+              gridRow: '1',
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '12px',
+              padding: '1.25rem',
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+              border: '1px solid rgba(0, 0, 0, 0.06)'
+            }}>
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
-                border: '1px solid rgba(0, 0, 0, 0.06)',
-                height: '100%'
+                fontSize: '0.75rem',
+                color: '#6b7280',
+                marginBottom: '1rem',
+                fontWeight: '600'
+              }}>
+                {'>'} DETAILED METRICS
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                gap: '1rem'
+              }}>
+                {[
+                  { label: 'PRESSURE', value: `${weather.main.pressure}`, unit: 'hPa' },
+                  { label: 'WIND', value: `${weather.wind.speed}`, unit: 'm/s' },
+                  { label: 'MIN', value: `${Math.round(weather.main.temp_min)}`, unit: '°C' },
+                  { label: 'MAX', value: `${Math.round(weather.main.temp_max)}`, unit: '°C' },
+                  { label: 'VISIBILITY', value: `${(weather.visibility / 1000).toFixed(1)}`, unit: 'km' },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      padding: '1rem',
+                      background: hexToRgba(themeColor, 0.05),
+                      borderRadius: '8px',
+                      border: `1px solid ${hexToRgba(themeColor, 0.15)}`,
+                      transition: 'all 0.2s ease',
+                      cursor: 'default'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = hexToRgba(themeColor, 0.1);
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = `0 4px 12px ${hexToRgba(themeColor, 0.2)}`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = hexToRgba(themeColor, 0.05);
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <div style={{
+                      fontSize: '0.6rem',
+                      color: '#9ca3af',
+                      marginBottom: '0.4rem',
+                      fontWeight: '600'
+                    }}>
+                      {item.label}
+                    </div>
+                    <div style={{
+                      fontSize: '1.3rem',
+                      fontWeight: 'bold',
+                      color: '#1a1f3a',
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: '0.2rem'
+                    }}>
+                      <span>{item.value}</span>
+                      <span style={{ fontSize: '0.7rem', color: '#6b7280' }}>{item.unit}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Sun Data - Bottom right (1/4) */}
+            <div style={{
+              gridColumn: '2 / 4',
+              gridRow: '2',
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '12px',
+              padding: '1.25rem',
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+              border: '1px solid rgba(0, 0, 0, 0.06)'
+            }}>
+              <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem', fontWeight: '600' }}>
+                {'>'} SUN DATA
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '1rem'
               }}>
                 <div style={{
-                  fontSize: '0.85rem',
-                  color: '#6b7280',
-                  marginBottom: '1.5rem',
-                  fontWeight: '600'
+                  padding: '1rem',
+                  background: hexToRgba(themeColor, 0.05),
+                  borderRadius: '8px',
+                  border: `1px solid ${hexToRgba(themeColor, 0.15)}`
                 }}>
-                  {'>'} DETAILED METRICS
+                  <div style={{ fontSize: '0.6rem', color: '#9ca3af', marginBottom: '0.4rem' }}>
+                    SUNRISE
+                  </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1a1f3a' }}>
+                    {new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
                 </div>
-
                 <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                  gap: '1.5rem'
+                  padding: '1rem',
+                  background: hexToRgba(themeColor, 0.05),
+                  borderRadius: '8px',
+                  border: `1px solid ${hexToRgba(themeColor, 0.15)}`
                 }}>
-                  {[
-                    { label: 'PRESSURE', value: `${weather.main.pressure}`, unit: 'hPa' },
-                    { label: 'WIND', value: `${weather.wind.speed}`, unit: 'm/s' },
-                    { label: 'MIN TEMP', value: `${Math.round(weather.main.temp_min)}`, unit: '°C' },
-                    { label: 'MAX TEMP', value: `${Math.round(weather.main.temp_max)}`, unit: '°C' },
-                    { label: 'VISIBILITY', value: `${(weather.visibility / 1000).toFixed(1)}`, unit: 'km' },
-                  ].map((item, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        padding: '1.25rem',
-                        background: hexToRgba(themeColor, 0.05),
-                        borderRadius: '8px',
-                        border: `1px solid ${hexToRgba(themeColor, 0.15)}`,
-                        transition: 'all 0.2s ease',
-                        cursor: 'default'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = hexToRgba(themeColor, 0.1);
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = `0 4px 12px ${hexToRgba(themeColor, 0.2)}`;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = hexToRgba(themeColor, 0.05);
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    >
-                      <div style={{
-                        fontSize: '0.7rem',
-                        color: '#9ca3af',
-                        marginBottom: '0.5rem',
-                        fontWeight: '600'
-                      }}>
-                        {item.label}
-                      </div>
-                      <div style={{
-                        fontSize: '1.75rem',
-                        fontWeight: 'bold',
-                        color: '#1a1f3a',
-                        display: 'flex',
-                        alignItems: 'baseline',
-                        gap: '0.25rem'
-                      }}>
-                        <span>{item.value}</span>
-                        <span style={{ fontSize: '0.9rem', color: '#6b7280' }}>{item.unit}</span>
-                      </div>
-                    </div>
-                  ))}
+                  <div style={{ fontSize: '0.6rem', color: '#9ca3af', marginBottom: '0.4rem' }}>
+                    SUNSET
+                  </div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1a1f3a' }}>
+                    {new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
                 </div>
               </div>
             </div>
@@ -538,13 +613,13 @@ const WeatherApp = () => {
             background: 'rgba(255, 255, 255, 0.7)',
             backdropFilter: 'blur(10px)',
             borderRadius: '16px',
-            padding: '4rem 2rem',
+            padding: '3rem 2rem',
             textAlign: 'center',
             boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
             border: `2px dashed ${hexToRgba(themeColor, 0.3)}`
           }}>
             <div style={{ 
-              fontSize: '4rem', 
+              fontSize: '3.5rem', 
               marginBottom: '1rem',
               color: themeColor,
               opacity: 0.4,
@@ -554,7 +629,7 @@ const WeatherApp = () => {
             </div>
             <div style={{ 
               color: '#6b7280',
-              fontSize: '1.1rem',
+              fontSize: '1rem',
               fontWeight: '600'
             }}>
               AWAITING INPUT...
@@ -564,6 +639,215 @@ const WeatherApp = () => {
       </div>
 
       <style>{`
+        /* Animated Weather Icons */
+        .weather-icon-animated {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 140px;
+          height: 140px;
+        }
+
+        /* Sun Animation */
+        .sun {
+          position: relative;
+        }
+        .sun-core {
+          font-size: 5rem;
+          animation: sunPulse 3s ease-in-out infinite;
+        }
+        .sun-rays {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          animation: sunRotate 20s linear infinite;
+        }
+        .sun-rays::before {
+          content: '✨';
+          position: absolute;
+          font-size: 2rem;
+          top: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+        .sun-rays::after {
+          content: '✨';
+          position: absolute;
+          font-size: 2rem;
+          bottom: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+
+        @keyframes sunPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+
+        @keyframes sunRotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        /* Rain Animation */
+        .rain {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .rain-cloud {
+          font-size: 4.5rem;
+          margin-bottom: -15px;
+          z-index: 2;
+        }
+        .rain-drops {
+          display: flex;
+          gap: 15px;
+          animation: rainFall 1s ease-in-out infinite;
+        }
+        .rain-drops span {
+          font-size: 1.5rem;
+          animation: dropFall 1s ease-in-out infinite;
+        }
+        .rain-drops span:nth-child(2) {
+          animation-delay: 0.3s;
+        }
+        .rain-drops span:nth-child(3) {
+          animation-delay: 0.6s;
+        }
+
+        @keyframes rainFall {
+          0%, 100% { transform: translateY(0); opacity: 1; }
+          50% { transform: translateY(10px); opacity: 0.7; }
+        }
+
+        @keyframes dropFall {
+          0% { transform: translateY(-5px); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateY(20px); opacity: 0; }
+        }
+
+        /* Drizzle Animation */
+        .drizzle {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .drizzle-cloud {
+          font-size: 5rem;
+          margin-bottom: -10px;
+        }
+        .drizzle-drops {
+          display: flex;
+          gap: 20px;
+          animation: drizzleFall 1.5s ease-in-out infinite;
+        }
+        .drizzle-drops span {
+          font-size: 1.2rem;
+          animation: dropFall 1.5s ease-in-out infinite;
+        }
+        .drizzle-drops span:nth-child(2) {
+          animation-delay: 0.5s;
+        }
+
+        @keyframes drizzleFall {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(8px); }
+        }
+
+        /* Thunderstorm Animation */
+        .thunderstorm {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .storm-cloud {
+          font-size: 5rem;
+          animation: stormShake 0.5s ease-in-out infinite;
+        }
+        .lightning {
+          font-size: 2rem;
+          margin-top: -15px;
+          animation: lightningFlash 2s ease-in-out infinite;
+        }
+
+        @keyframes stormShake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-2px); }
+          75% { transform: translateX(2px); }
+        }
+
+        @keyframes lightningFlash {
+          0%, 90%, 100% { opacity: 0; }
+          92%, 94% { opacity: 1; }
+        }
+
+        /* Snow Animation */
+        .snow {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .snow-cloud {
+          font-size: 4.5rem;
+          margin-bottom: -10px;
+        }
+        .snowflakes {
+          display: flex;
+          gap: 12px;
+        }
+        .snowflakes span {
+          font-size: 1.5rem;
+          animation: snowFall 3s ease-in-out infinite;
+        }
+        .snowflakes span:nth-child(1) {
+          animation-delay: 0s;
+        }
+        .snowflakes span:nth-child(2) {
+          animation-delay: 1s;
+        }
+        .snowflakes span:nth-child(3) {
+          animation-delay: 2s;
+        }
+
+        @keyframes snowFall {
+          0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateY(30px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Clouds Animation */
+        .clouds span {
+          animation: cloudFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes cloudFloat {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(10px); }
+        }
+
+        /* Mist/Fog Animation */
+        .mist span, .fog span {
+          animation: mistFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes mistFloat {
+          0%, 100% { opacity: 0.6; transform: translateX(0); }
+          50% { opacity: 0.9; transform: translateX(5px); }
+        }
+
+        /* Smoke/Dust Animation */
+        .smoke span, .dust span {
+          animation: smokeDrift 2s ease-in-out infinite;
+        }
+
+        @keyframes smokeDrift {
+          0%, 100% { transform: translateX(0) scale(1); opacity: 0.7; }
+          50% { transform: translateX(8px) scale(1.1); opacity: 1; }
+        }
+
+        /* General Animations */
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -585,10 +869,48 @@ const WeatherApp = () => {
           opacity: 0.6;
         }
 
-        /* Responsive breakpoints */
+        /* Responsive Layout */
+        @media (max-width: 1200px) {
+          .weather-layout {
+            grid-template-columns: 1fr 1fr !important;
+            grid-template-rows: auto auto auto !important;
+          }
+          .weather-layout > div:first-child {
+            grid-column: 1 / 3 !important;
+            grid-row: 1 !important;
+          }
+          .weather-layout > div:nth-child(2) {
+            grid-column: 1 / 3 !important;
+            grid-row: 2 !important;
+          }
+          .weather-layout > div:nth-child(3) {
+            grid-column: 1 / 3 !important;
+            grid-row: 3 !important;
+          }
+        }
+
         @media (max-width: 768px) {
-          .weather-grid {
+          .weather-layout {
             grid-template-columns: 1fr !important;
+          }
+          .weather-layout > div {
+            grid-column: 1 !important;
+          }
+          h1 {
+            font-size: 1.25rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          h1 {
+            font-size: 1.1rem !important;
+          }
+          .weather-icon-animated {
+            width: 100px !important;
+            height: 100px !important;
+          }
+          .sun-core, .rain-cloud, .drizzle-cloud, .storm-cloud, .clouds span {
+            font-size: 3.5rem !important;
           }
         }
 
