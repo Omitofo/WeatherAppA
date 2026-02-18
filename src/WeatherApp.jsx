@@ -660,18 +660,21 @@ const WeatherApp = () => {
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {(() => {
                       try {
-                        // API gives UTC timestamp, we add the location's timezone offset
-                        const utcTime = weather.sys.sunrise * 1000;
-                        const offsetMs = (weather.timezone || 0) * 1000;
-                        const localTime = new Date(utcTime + offsetMs);
+                        // sunrise is UTC timestamp - create date and format in location's local time
+                        const date = new Date(weather.sys.sunrise * 1000);
+                        const offsetMinutes = (weather.timezone || 0) / 60;
                         
-                        // Extract hours and minutes in UTC (since we already added offset)
-                        let hours = localTime.getUTCHours();
-                        const minutes = localTime.getUTCMinutes();
+                        // Get UTC time and add the location's offset
+                        const utcHours = date.getUTCHours();
+                        const utcMinutes = date.getUTCMinutes();
+                        const totalMinutes = utcHours * 60 + utcMinutes + offsetMinutes;
+                        
+                        let hours = Math.floor(totalMinutes / 60) % 24;
+                        const minutes = totalMinutes % 60;
                         const ampm = hours >= 12 ? 'PM' : 'AM';
-                        hours = hours % 12 || 12; // Convert to 12-hour format
+                        hours = hours % 12 || 12;
                         
-                        return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+                        return `${hours}:${Math.abs(minutes).toString().padStart(2, '0')} ${ampm}`;
                       } catch (e) {
                         return '--:--';
                       }
@@ -690,16 +693,19 @@ const WeatherApp = () => {
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {(() => {
                       try {
-                        const utcTime = weather.sys.sunset * 1000;
-                        const offsetMs = (weather.timezone || 0) * 1000;
-                        const localTime = new Date(utcTime + offsetMs);
+                        const date = new Date(weather.sys.sunset * 1000);
+                        const offsetMinutes = (weather.timezone || 0) / 60;
                         
-                        let hours = localTime.getUTCHours();
-                        const minutes = localTime.getUTCMinutes();
+                        const utcHours = date.getUTCHours();
+                        const utcMinutes = date.getUTCMinutes();
+                        const totalMinutes = utcHours * 60 + utcMinutes + offsetMinutes;
+                        
+                        let hours = Math.floor(totalMinutes / 60) % 24;
+                        const minutes = totalMinutes % 60;
                         const ampm = hours >= 12 ? 'PM' : 'AM';
                         hours = hours % 12 || 12;
                         
-                        return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+                        return `${hours}:${Math.abs(minutes).toString().padStart(2, '0')} ${ampm}`;
                       } catch (e) {
                         return '--:--';
                       }
