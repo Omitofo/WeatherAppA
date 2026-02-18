@@ -658,11 +658,12 @@ const WeatherApp = () => {
                     SUNRISE
                   </div>
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
-                    {new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit',
-                      timeZone: 'UTC'
-                    })}
+                    {(() => {
+                      const sunriseUTC = weather.sys.sunrise * 1000;
+                      const timezoneOffset = weather.timezone * 1000; // API provides offset in seconds
+                      const localTime = new Date(sunriseUTC + timezoneOffset);
+                      return localTime.toISOString().substr(11, 5); // Extract HH:MM
+                    })()}
                   </div>
                 </div>
                 <div style={{
@@ -675,11 +676,12 @@ const WeatherApp = () => {
                     SUNSET
                   </div>
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
-                    {new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit',
-                      timeZone: 'UTC'
-                    })}
+                    {(() => {
+                      const sunsetUTC = weather.sys.sunset * 1000;
+                      const timezoneOffset = weather.timezone * 1000;
+                      const localTime = new Date(sunsetUTC + timezoneOffset);
+                      return localTime.toISOString().substr(11, 5); // Extract HH:MM
+                    })()}
                   </div>
                 </div>
               </div>
