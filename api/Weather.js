@@ -39,6 +39,11 @@ function sanitizeCity(city) {
  */
 function isRateLimited(ip) {
   const now = Date.now();
+
+  // Memory guard: prevent unbounded growth
+  if (ipRequestLog.size > 10000) {
+    ipRequestLog.clear();
+  }
   const log = (ipRequestLog.get(ip) || []).filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
 
   if (log.length >= MAX_REQUESTS_PER_IP) return true;
@@ -113,7 +118,10 @@ export default async function handler(req, res) {
   // In production, set ALLOWED_ORIGIN to your exact domain (e.g. https://myapp.vercel.app)
   // Wildcard '*' is fine during development but restricts credentialed requests.
   const allowedOrigin = process.env.ALLOWED_ORIGIN;
-  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  if (allowedOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+    res.setHeader('Vary', 'Origin'); // important for caching proxies
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
