@@ -93,6 +93,7 @@ function pickWeatherFields(data) {
     },
     wind:       { speed: data.wind.speed },
     visibility: data.visibility,
+    timezone:   data.timezone, // FIXED: Add timezone offset in seconds from UTC
   };
 }
 
