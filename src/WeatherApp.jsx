@@ -659,10 +659,16 @@ const WeatherApp = () => {
                   </div>
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {(() => {
-                      const sunriseUTC = weather.sys.sunrise * 1000;
-                      const timezoneOffset = weather.timezone * 1000; // API provides offset in seconds
-                      const localTime = new Date(sunriseUTC + timezoneOffset);
-                      return localTime.toISOString().substr(11, 5); // Extract HH:MM
+                      try {
+                        const sunriseUTC = weather.sys.sunrise * 1000;
+                        const timezoneOffset = (weather.timezone || 0) * 1000;
+                        const localTime = new Date(sunriseUTC + timezoneOffset);
+                        const hours = localTime.getUTCHours().toString().padStart(2, '0');
+                        const minutes = localTime.getUTCMinutes().toString().padStart(2, '0');
+                        return `${hours}:${minutes}`;
+                      } catch (e) {
+                        return '--:--';
+                      }
                     })()}
                   </div>
                 </div>
@@ -677,10 +683,16 @@ const WeatherApp = () => {
                   </div>
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {(() => {
-                      const sunsetUTC = weather.sys.sunset * 1000;
-                      const timezoneOffset = weather.timezone * 1000;
-                      const localTime = new Date(sunsetUTC + timezoneOffset);
-                      return localTime.toISOString().substr(11, 5); // Extract HH:MM
+                      try {
+                        const sunsetUTC = weather.sys.sunset * 1000;
+                        const timezoneOffset = (weather.timezone || 0) * 1000;
+                        const localTime = new Date(sunsetUTC + timezoneOffset);
+                        const hours = localTime.getUTCHours().toString().padStart(2, '0');
+                        const minutes = localTime.getUTCMinutes().toString().padStart(2, '0');
+                        return `${hours}:${minutes}`;
+                      } catch (e) {
+                        return '--:--';
+                      }
                     })()}
                   </div>
                 </div>
@@ -970,78 +982,78 @@ const WeatherApp = () => {
           height: 0;
           border-top: 8px solid transparent;
           border-bottom: 8px solid transparent;
-          border-left: 45px solid ${themeColor};
-          transform-origin: 0% 50%;
+          border-right: 45px solid ${themeColor};
+          transform-origin: 100% 50%;
           filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
         }
 
         /* Wind Speed Animations */
-        /* Calm: 0-2 m/s - Points up-left at 120 degrees (top-left, droopy) */
+        /* Calm: 0-2 m/s - Hangs down at -60 degrees (below horizontal, droopy) */
         .wind-calm .windsock-cone {
-          border-left-width: 25px;
+          border-right-width: 25px;
           opacity: 0.5;
           animation: windCalm 4s ease-in-out infinite;
         }
 
-        /* Light: 2-5 m/s - Up-left at 150 degrees (lifting slightly) */
+        /* Light: 2-5 m/s - Slightly lifted at -30 degrees */
         .wind-light .windsock-cone {
-          border-left-width: 30px;
+          border-right-width: 30px;
           opacity: 0.65;
           animation: windLight 2.5s ease-in-out infinite;
         }
 
-        /* Moderate: 5-10 m/s - Slightly above horizontal left at 170 degrees */
+        /* Moderate: 5-10 m/s - Nearly horizontal at -10 degrees */
         .wind-moderate .windsock-cone {
-          border-left-width: 38px;
+          border-right-width: 38px;
           opacity: 0.8;
           animation: windModerate 1.8s ease-in-out infinite;
         }
 
-        /* Strong: 10-15 m/s - Horizontal to the left at 180 degrees */
+        /* Strong: 10-15 m/s - Fully horizontal at 0 degrees */
         .wind-strong .windsock-cone {
-          border-left-width: 45px;
+          border-right-width: 45px;
           opacity: 0.95;
           animation: windStrong 1.2s ease-in-out infinite;
         }
 
-        /* Gale: 15+ m/s - Horizontal to the left at 180 degrees with violent movement */
+        /* Gale: 15+ m/s - Fully horizontal at 0 degrees with violent movement */
         .wind-gale .windsock-cone {
-          border-left-width: 50px;
+          border-right-width: 50px;
           opacity: 1;
           animation: windGale 0.5s ease-in-out infinite;
         }
 
         @keyframes windCalm {
-          0%, 100% { transform: rotate(120deg) scaleX(0.75); }
-          50% { transform: rotate(124deg) scaleX(0.8); }
+          0%, 100% { transform: rotate(-64deg) scaleX(0.75); }
+          50% { transform: rotate(-56deg) scaleX(0.8); }
         }
 
         @keyframes windLight {
-          0%, 100% { transform: rotate(150deg) scaleX(0.85); }
-          50% { transform: rotate(154deg) scaleX(0.9); }
+          0%, 100% { transform: rotate(-34deg) scaleX(0.85); }
+          50% { transform: rotate(-26deg) scaleX(0.9); }
         }
 
         @keyframes windModerate {
-          0%, 100% { transform: rotate(170deg) scaleX(0.95); }
-          50% { transform: rotate(174deg) scaleX(1); }
+          0%, 100% { transform: rotate(-14deg) scaleX(0.95); }
+          50% { transform: rotate(-6deg) scaleX(1); }
         }
 
         @keyframes windStrong {
-          0%, 100% { transform: rotate(182deg) scaleX(1.05); }
-          25% { transform: rotate(177deg) scaleX(1.1); }
-          50% { transform: rotate(182deg) scaleX(1.05); }
-          75% { transform: rotate(177deg) scaleX(1.1); }
+          0%, 100% { transform: rotate(-2deg) scaleX(1.05); }
+          25% { transform: rotate(3deg) scaleX(1.1); }
+          50% { transform: rotate(-2deg) scaleX(1.05); }
+          75% { transform: rotate(3deg) scaleX(1.1); }
         }
 
         @keyframes windGale {
-          0% { transform: rotate(180deg) scaleX(1.1); }
-          15% { transform: rotate(172deg) scaleX(1.15); }
-          30% { transform: rotate(186deg) scaleX(1.2); }
-          45% { transform: rotate(173deg) scaleX(1.15); }
-          60% { transform: rotate(185deg) scaleX(1.18); }
-          75% { transform: rotate(174deg) scaleX(1.15); }
-          90% { transform: rotate(184deg) scaleX(1.17); }
-          100% { transform: rotate(180deg) scaleX(1.1); }
+          0% { transform: rotate(0deg) scaleX(1.1); }
+          15% { transform: rotate(-8deg) scaleX(1.15); }
+          30% { transform: rotate(6deg) scaleX(1.2); }
+          45% { transform: rotate(-7deg) scaleX(1.15); }
+          60% { transform: rotate(5deg) scaleX(1.18); }
+          75% { transform: rotate(-6deg) scaleX(1.15); }
+          90% { transform: rotate(4deg) scaleX(1.17); }
+          100% { transform: rotate(0deg) scaleX(1.1); }
         }
 
         /* General Animations */
