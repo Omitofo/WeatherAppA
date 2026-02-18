@@ -383,7 +383,7 @@ const WeatherApp = () => {
             display: 'grid',
             gridTemplateColumns: '2fr 1fr 1fr',
             gridTemplateRows: 'auto auto',
-            gap: '1.5rem',
+            gap: '1.25rem',
             animation: 'fadeIn 0.5s ease-out'
           }}>
             {/* Main Weather Card - Spans 2 rows on left (2/4) */}
@@ -393,7 +393,7 @@ const WeatherApp = () => {
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(10px)',
               borderRadius: '16px',
-              padding: '1.5rem',
+              padding: '1.25rem',
               boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
               border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
               position: 'relative',
@@ -423,9 +423,9 @@ const WeatherApp = () => {
               <div className="temp-display-container" style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr 1fr',
-                gap: '1rem',
-                marginTop: '1rem',
-                marginBottom: '1.5rem',
+                gap: '0.75rem',
+                marginTop: '0.75rem',
+                marginBottom: '1rem',
                 alignItems: 'center'
               }}>
                 {/* Temperature Display - First Column */}
@@ -485,7 +485,7 @@ const WeatherApp = () => {
                   <div style={{
                     background: `linear-gradient(135deg, ${hexToRgba(themeColor, 0.1)}, ${hexToRgba(themeColor, 0.05)})`,
                     borderRadius: '20px',
-                    padding: '1.5rem',
+                    padding: '1.25rem',
                     border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
                     boxShadow: `0 8px 24px ${hexToRgba(themeColor, 0.2)}`
                   }}>
@@ -501,7 +501,7 @@ const WeatherApp = () => {
                   <div style={{
                     background: `linear-gradient(135deg, ${hexToRgba(themeColor, 0.1)}, ${hexToRgba(themeColor, 0.05)})`,
                     borderRadius: '20px',
-                    padding: '1.5rem',
+                    padding: '1.25rem',
                     border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
                     boxShadow: `0 8px 24px ${hexToRgba(themeColor, 0.2)}`,
                     display: 'flex',
@@ -529,8 +529,8 @@ const WeatherApp = () => {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '1rem',
-                paddingTop: '1rem',
+                gap: '0.75rem',
+                paddingTop: '0.75rem',
                 borderTop: `1px solid ${hexToRgba(themeColor, 0.2)}`
               }}>
                 <div style={{ textAlign: 'center' }}>
@@ -658,7 +658,11 @@ const WeatherApp = () => {
                     SUNRISE
                   </div>
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
-                    {new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(weather.sys.sunrise * 1000).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit',
+                      timeZone: 'UTC'
+                    })}
                   </div>
                 </div>
                 <div style={{
@@ -671,7 +675,11 @@ const WeatherApp = () => {
                     SUNSET
                   </div>
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
-                    {new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(weather.sys.sunset * 1000).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit',
+                      timeZone: 'UTC'
+                    })}
                   </div>
                 </div>
               </div>
@@ -927,12 +935,14 @@ const WeatherApp = () => {
           display: flex;
           align-items: center;
           justify-content: center;
+          margin: 0 auto;
         }
 
         .windsock-pole {
           position: absolute;
-          left: 15px;
-          bottom: 10px;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
           width: 3px;
           height: 50px;
           background: linear-gradient(180deg, #4b5563 0%, #6b7280 100%);
@@ -952,33 +962,33 @@ const WeatherApp = () => {
 
         .windsock-cone {
           position: absolute;
-          left: 18px;
-          top: 15px;
+          left: 50%;
+          top: 50%;
           width: 0;
           height: 0;
           border-top: 8px solid transparent;
           border-bottom: 8px solid transparent;
           border-left: 45px solid ${themeColor};
-          transform-origin: left center;
+          transform-origin: 0% 50%;
           filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
         }
 
         /* Wind Speed Animations */
-        /* Calm: 0-2 m/s - Hangs down-left at 240 degrees (bottom-left, droopy) */
+        /* Calm: 0-2 m/s - Points up-left at 120 degrees (top-left, droopy) */
         .wind-calm .windsock-cone {
           border-left-width: 25px;
           opacity: 0.5;
           animation: windCalm 4s ease-in-out infinite;
         }
 
-        /* Light: 2-5 m/s - Down-left at 210 degrees (lifting slightly) */
+        /* Light: 2-5 m/s - Up-left at 150 degrees (lifting slightly) */
         .wind-light .windsock-cone {
           border-left-width: 30px;
           opacity: 0.65;
           animation: windLight 2.5s ease-in-out infinite;
         }
 
-        /* Moderate: 5-10 m/s - Slightly below horizontal left at 190 degrees */
+        /* Moderate: 5-10 m/s - Slightly above horizontal left at 170 degrees */
         .wind-moderate .windsock-cone {
           border-left-width: 38px;
           opacity: 0.8;
@@ -1000,34 +1010,36 @@ const WeatherApp = () => {
         }
 
         @keyframes windCalm {
-          0%, 100% { transform: rotate(-60deg) scaleX(0.8); }
-          50% { transform: rotate(-56deg) scaleX(0.85); }
+          0%, 100% { transform: rotate(120deg) scaleX(0.75); }
+          50% { transform: rotate(124deg) scaleX(0.8); }
         }
 
         @keyframes windLight {
-          0%, 100% { transform: rotate(-30deg) scaleX(0.9); }
-          50% { transform: rotate(-26deg) scaleX(0.95); }
+          0%, 100% { transform: rotate(150deg) scaleX(0.85); }
+          50% { transform: rotate(154deg) scaleX(0.9); }
         }
 
         @keyframes windModerate {
-          0%, 100% { transform: rotate(-10deg) scaleX(1); }
-          50% { transform: rotate(-6deg) scaleX(1.05); }
+          0%, 100% { transform: rotate(170deg) scaleX(0.95); }
+          50% { transform: rotate(174deg) scaleX(1); }
         }
 
         @keyframes windStrong {
-          0%, 100% { transform: rotate(2deg) scaleX(1.08); }
-          25% { transform: rotate(-2deg) scaleX(1.12); }
-          50% { transform: rotate(2deg) scaleX(1.08); }
-          75% { transform: rotate(-2deg) scaleX(1.12); }
+          0%, 100% { transform: rotate(182deg) scaleX(1.05); }
+          25% { transform: rotate(177deg) scaleX(1.1); }
+          50% { transform: rotate(182deg) scaleX(1.05); }
+          75% { transform: rotate(177deg) scaleX(1.1); }
         }
 
         @keyframes windGale {
-          0% { transform: rotate(0deg) scaleX(1.15); }
-          20% { transform: rotate(-5deg) scaleX(1.2); }
-          40% { transform: rotate(5deg) scaleX(1.18); }
-          60% { transform: rotate(-3deg) scaleX(1.2); }
-          80% { transform: rotate(3deg) scaleX(1.18); }
-          100% { transform: rotate(0deg) scaleX(1.15); }
+          0% { transform: rotate(180deg) scaleX(1.1); }
+          15% { transform: rotate(172deg) scaleX(1.15); }
+          30% { transform: rotate(186deg) scaleX(1.2); }
+          45% { transform: rotate(173deg) scaleX(1.15); }
+          60% { transform: rotate(185deg) scaleX(1.18); }
+          75% { transform: rotate(174deg) scaleX(1.15); }
+          90% { transform: rotate(184deg) scaleX(1.17); }
+          100% { transform: rotate(180deg) scaleX(1.1); }
         }
 
         /* General Animations */
