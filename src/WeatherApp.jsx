@@ -660,12 +660,18 @@ const WeatherApp = () => {
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {(() => {
                       try {
-                        const sunriseUTC = weather.sys.sunrise * 1000;
-                        const timezoneOffset = (weather.timezone || 0) * 1000;
-                        const localTime = new Date(sunriseUTC + timezoneOffset);
-                        const hours = localTime.getUTCHours().toString().padStart(2, '0');
-                        const minutes = localTime.getUTCMinutes().toString().padStart(2, '0');
-                        return `${hours}:${minutes}`;
+                        // API gives UTC timestamp, we add the location's timezone offset
+                        const utcTime = weather.sys.sunrise * 1000;
+                        const offsetMs = (weather.timezone || 0) * 1000;
+                        const localTime = new Date(utcTime + offsetMs);
+                        
+                        // Extract hours and minutes in UTC (since we already added offset)
+                        let hours = localTime.getUTCHours();
+                        const minutes = localTime.getUTCMinutes();
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12 || 12; // Convert to 12-hour format
+                        
+                        return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
                       } catch (e) {
                         return '--:--';
                       }
@@ -684,12 +690,16 @@ const WeatherApp = () => {
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {(() => {
                       try {
-                        const sunsetUTC = weather.sys.sunset * 1000;
-                        const timezoneOffset = (weather.timezone || 0) * 1000;
-                        const localTime = new Date(sunsetUTC + timezoneOffset);
-                        const hours = localTime.getUTCHours().toString().padStart(2, '0');
-                        const minutes = localTime.getUTCMinutes().toString().padStart(2, '0');
-                        return `${hours}:${minutes}`;
+                        const utcTime = weather.sys.sunset * 1000;
+                        const offsetMs = (weather.timezone || 0) * 1000;
+                        const localTime = new Date(utcTime + offsetMs);
+                        
+                        let hours = localTime.getUTCHours();
+                        const minutes = localTime.getUTCMinutes();
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12 || 12;
+                        
+                        return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
                       } catch (e) {
                         return '--:--';
                       }
