@@ -298,7 +298,8 @@ const WeatherApp = () => {
           <div style={{ 
             display: 'flex', 
             gap: '0.75rem',
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            justifyContent: 'center'
           }}>
             <input
               type="text"
