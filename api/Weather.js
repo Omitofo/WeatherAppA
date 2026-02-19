@@ -39,8 +39,7 @@ function sanitizeCity(city) {
  */
 function isRateLimited(ip) {
   const now = Date.now();
-
-  // Memory guard: prevent unbounded growth
+    // Memory guard: prevent unbounded growth
   if (ipRequestLog.size > 10000) {
     ipRequestLog.clear();
   }
@@ -86,6 +85,7 @@ async function fetchWithTimeout(url, timeoutMs) {
 function pickWeatherFields(data) {
   return {
     name:       data.name,
+    coord:      { lat: data.coord.lat, lon: data.coord.lon }, // Add coordinates for map
     sys:        { country: data.sys.country, sunrise: data.sys.sunrise, sunset: data.sys.sunset },
     weather:    [{ main: data.weather[0].main, description: data.weather[0].description }],
     main: {

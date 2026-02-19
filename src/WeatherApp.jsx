@@ -25,6 +25,90 @@ const WeatherApp = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Initialize map when weather data changes
+  useEffect(() => {
+    if (!weather) return;
+
+    // Load Leaflet dynamically
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.async = true;
+    
+    script.onload = () => {
+      // Wait a bit for DOM to be ready
+      setTimeout(() => {
+        const mapContainer = document.getElementById('weather-map');
+        if (!mapContainer || !window.L) return;
+
+        // Clear existing map if any
+        mapContainer.innerHTML = '';
+        const mapDiv = document.createElement('div');
+        mapDiv.style.width = '100%';
+        mapDiv.style.height = '100%';
+        mapContainer.appendChild(mapDiv);
+
+        // Get coordinates (OpenWeatherMap API should provide coord data)
+        // For now, we'll use a geocoding approximation or require coord in API
+        const lat = weather.coord?.lat || 0;
+        const lon = weather.coord?.lon || 0;
+
+        // Initialize map
+        const map = window.L.map(mapDiv, {
+          zoomControl: true,
+          attributionControl: true
+        }).setView([lat, lon], 10);
+
+        // Add OpenStreetMap tiles
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 18
+        }).addTo(map);
+
+        // Add marker for the city
+        const marker = window.L.marker([lat, lon], {
+          icon: window.L.divIcon({
+            className: 'custom-marker',
+            html: `<div style="
+              background: ${themeColor};
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              border: 3px solid white;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 16px;
+            ">📍</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          })
+        }).addTo(map);
+
+        marker.bindPopup(`
+          <div style="font-family: 'Courier New', monospace; padding: 8px;">
+            <strong>${weather.name}, ${weather.sys.country}</strong><br/>
+            ${Math.round(weather.main.temp)}°C - ${weather.weather[0].description}
+          </div>
+        `).openPopup();
+
+        // Store map instance for cleanup
+        mapContainer._leafletMap = map;
+      }, 100);
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup map on unmount
+      const mapContainer = document.getElementById('weather-map');
+      if (mapContainer?._leafletMap) {
+        mapContainer._leafletMap.remove();
+        delete mapContainer._leafletMap;
+      }
+    };
+  }, [weather, themeColor]);
+
   const searchWeather = async () => {
     if (!location.trim()) return;
     
@@ -298,8 +382,7 @@ const WeatherApp = () => {
           <div style={{ 
             display: 'flex', 
             gap: '0.75rem',
-            flexWrap: 'wrap',
-            justifyContent: 'center'
+            flexWrap: 'wrap'
           }}>
             <input
               type="text"
@@ -380,13 +463,14 @@ const WeatherApp = () => {
 
         {/* Weather Display - 3 Column Layout */}
         {weather && (
-          <div className="weather-layout" style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr 1fr',
-            gridTemplateRows: 'auto auto',
-            gap: '1.25rem',
-            animation: 'fadeIn 0.5s ease-out'
-          }}>
+          <>
+            <div className="weather-layout" style={{
+              display: 'grid',
+              gridTemplateColumns: '2fr 1fr 1fr',
+              gridTemplateRows: 'auto auto',
+              gap: '1.25rem',
+              animation: 'fadeIn 0.5s ease-out'
+            }}>
             {/* Main Weather Card - Spans 2 rows on left (2/4) */}
             <div style={{
               gridColumn: '1',
@@ -715,7 +799,49 @@ const WeatherApp = () => {
                 </div>
               </div>
             </div>
-          </div>
+
+            {/* Map Component - Full Width Below - Grid item 3 */}
+            <div style={{
+              gridColumn: '1 / 4',
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '16px',
+              padding: '1.25rem',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+              border: `2px solid ${hexToRgba(themeColor, 0.2)}`,
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                fontSize: '0.85rem',
+                color: '#6b7280',
+                marginBottom: '1rem',
+                fontWeight: '600'
+              }}>
+                {'>'} LOCATION MAP
+              </div>
+              
+              <div 
+                id="weather-map"
+                style={{
+                  width: '100%',
+                  height: '400px',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  border: `1px solid ${hexToRgba(themeColor, 0.2)}`,
+                  position: 'relative'
+                }}
+              >
+                {/* Map will be rendered here via Leaflet */}
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                <div style={{ 
+                  width: '100%', 
+                  height: '100%',
+                  background: '#f8f9fa'
+                }} />
+              </div>
+            </div>
+            </div>
+          </>
         )}
 
         {/* Initial State */}
@@ -1159,6 +1285,11 @@ const WeatherApp = () => {
           }
           .temp-display-container > div:nth-child(1) > div:nth-child(2) {
             font-size: 1rem !important;
+          }
+
+          /* Map height on mobile */
+          #weather-map {
+            height: 300px !important;
           }
         }
 
