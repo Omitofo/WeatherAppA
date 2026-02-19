@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 // Layout: 2/4 main weather (left) | 1/4 metrics (top right) | 1/4 sun data (bottom right)
 
 const WeatherApp = () => {
-
   const [weather, setWeather] = useState(null);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,126 +29,134 @@ const WeatherApp = () => {
   useEffect(() => {
     if (!weather) return;
 
-    // Load Leaflet dynamically
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    script.async = true;
-    
-script.onload = () => {
-  setTimeout(() => {
-    const mapContainer = document.getElementById('weather-map');
-    if (!mapContainer || !window.L) return;
+    const initMap = () => {
+      const mapContainer = document.getElementById('weather-map');
+      if (!mapContainer || !window.L) return;
 
-    // Limpiar mapa anterior si existe
-    if (mapContainer._leafletMap) {
-      mapContainer._leafletMap.remove();
-    }
-
-    const lat = weather.coord?.lat || 0;
-    const lon = weather.coord?.lon || 0;
-
-    // Inicializar mapa
-    const map = window.L.map(mapContainer, {
-      zoomControl: true,
-      attributionControl: true
-    }).setView([lat, lon], 10);
-
-    // ──────────── Capas Base ────────────
-    const layers = {};
-
-    // 1. OpenStreetMap
-    layers['OSM'] = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 19
-    });
-
-    // 2. CartoDB Positron (default)
-    layers['CartoDB Positron'] = window.L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-      {
-        attribution: '© OpenStreetMap © CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19
+      // Limpiar mapa anterior si existe
+      if (mapContainer._leafletMap) {
+        mapContainer._leafletMap.remove();
+        delete mapContainer._leafletMap;
       }
-    ).addTo(map);
 
-    // 3. Mapbox (opcional, requiere API key)
-    if (process.env.REACT_APP_MAPBOX_API_KEY) {
-      layers['Mapbox Streets'] = window.L.tileLayer(
-        `https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${process.env.REACT_APP_MAPBOX_API_KEY}`,
+      const lat = weather.coord?.lat || 0;
+      const lon = weather.coord?.lon || 0;
+
+      // Inicializar mapa
+      const map = window.L.map(mapContainer, {
+        zoomControl: true,
+        attributionControl: true
+      }).setView([lat, lon], 10);
+
+      // ──────────── Capas Base ────────────
+      const layers = {};
+
+      // 1. OpenStreetMap
+      layers['OSM'] = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+      });
+
+      // 2. CartoDB Positron (default)
+      layers['CartoDB Positron'] = window.L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
         {
-          attribution: '© Mapbox © OpenStreetMap',
-          tileSize: 512,
-          zoomOffset: -1,
-          maxZoom: 20
+          attribution: '© OpenStreetMap © CARTO',
+          subdomains: 'abcd',
+          maxZoom: 19
         }
+      ).addTo(map);
+
+      // 3. Mapbox (opcional, requiere API key)
+      if (import.meta.env.VITE_MAPBOX_API_KEY) {
+        layers['Mapbox Streets'] = window.L.tileLayer(
+          `https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_API_KEY}`,
+          {
+            attribution: '© Mapbox © OpenStreetMap',
+            tileSize: 512,
+            zoomOffset: -1,
+            maxZoom: 20
+          }
+        );
+      }
+
+      // ──────────── Overlays de Clima ────────────
+      const owmKey = import.meta.env.VITE_OWM_KEY;
+      console.log('OWM KEY resolved:', owmKey ? '✅ found' : '❌ undefined');
+
+      const overlays = {};
+
+      overlays['Nubes'] = window.L.tileLayer(
+        `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${owmKey}`,
+        { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
       );
+
+      overlays['Lluvia'] = window.L.tileLayer(
+        `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${owmKey}`,
+        { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
+      );
+
+      overlays['Viento'] = window.L.tileLayer(
+        `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${owmKey}`,
+        { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
+      );
+
+      // Añadir control de capas (base + overlays)
+      window.L.control.layers(layers, overlays, { collapsed: false, position: 'topright' }).addTo(map);
+
+      // ──────────── Marcador principal ────────────
+      const marker = window.L.marker([lat, lon], {
+        icon: window.L.divIcon({
+          className: 'custom-marker',
+          html: `<div style="
+            background: ${themeColor};
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+          ">📍</div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        })
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <div style="font-family: 'Courier New', monospace; padding: 8px;">
+          <strong>${weather.name}, ${weather.sys.country}</strong><br/>
+          ${Math.round(weather.main.temp)}°C - ${weather.weather[0].description}
+        </div>
+      `).openPopup();
+
+      // Forzar recalculo si el contenedor cambia de tamaño
+      setTimeout(() => map.invalidateSize(), 50);
+
+      // Guardar referencia para limpieza
+      mapContainer._leafletMap = map;
+    };
+
+    // If Leaflet is already loaded, init immediately; otherwise load it first
+    if (window.L) {
+      setTimeout(initMap, 100);
+    } else {
+      const existingScript = document.querySelector('script[src*="leaflet"]');
+      if (existingScript) {
+        // Script tag exists but L not ready yet — wait for it
+        existingScript.addEventListener('load', () => setTimeout(initMap, 100));
+      } else {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.async = true;
+        script.onload = () => setTimeout(initMap, 100);
+        document.head.appendChild(script);
+      }
     }
-
-    // ──────────── Overlays de Clima ────────────
-    const overlays = {};
-
-    overlays['Nubes'] = window.L.tileLayer(
-      `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${process.env.VITE_OWM_KEY}`,
-      { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
-    );
-
-    overlays['Lluvia'] = window.L.tileLayer(
-      `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${process.env.VITE_OWM_KEY}`,
-      { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
-    );
-
-    overlays['Viento'] = window.L.tileLayer(
-      `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${process.env.VITE_OWM_KEY}`,
-      { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
-    );
-
-    // Añadir control de capas (base + overlays)
-    window.L.control.layers(layers, overlays, { collapsed: false, position: 'topright' }).addTo(map);
-
-    // ──────────── Marcador principal ────────────
-    const marker = window.L.marker([lat, lon], {
-      icon: window.L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="
-          background: ${themeColor};
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          border: 3px solid white;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-        ">📍</div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      })
-    }).addTo(map);
-
-    marker.bindPopup(`
-      <div style="font-family: 'Courier New', monospace; padding: 8px;">
-        <strong>${weather.name}, ${weather.sys.country}</strong><br/>
-        ${Math.round(weather.main.temp)}°C - ${weather.weather[0].description}
-      </div>
-    `).openPopup();
-
-    // Forzar recalculo si el contenedor cambia de tamaño
-    setTimeout(() => map.invalidateSize(), 50);
-
-    // Guardar referencia para limpieza
-    mapContainer._leafletMap = map;
-  }, 100);
-};
-
-
-
-
-    document.head.appendChild(script);
 
     return () => {
-      // Cleanup map on unmount
       const mapContainer = document.getElementById('weather-map');
       if (mapContainer?._leafletMap) {
         mapContainer._leafletMap.remove();
@@ -188,11 +195,11 @@ script.onload = () => {
 
   // Determine wind animation class based on speed (m/s)
   const getWindClass = (speed) => {
-    if (speed < 2) return 'wind-calm';       // 0-2 m/s: Calm
-    if (speed < 5) return 'wind-light';      // 2-5 m/s: Light breeze
-    if (speed < 10) return 'wind-moderate';  // 5-10 m/s: Moderate
-    if (speed < 15) return 'wind-strong';    // 10-15 m/s: Strong
-    return 'wind-gale';                      // 15+ m/s: Gale
+    if (speed < 2) return 'wind-calm';
+    if (speed < 5) return 'wind-light';
+    if (speed < 10) return 'wind-moderate';
+    if (speed < 15) return 'wind-strong';
+    return 'wind-gale';
   };
 
   const getWeatherIcon = (condition) => {
@@ -583,7 +590,7 @@ script.onload = () => {
                     {weather.weather[0].description}
                   </div>
                   
-                  {/* Windsock - Mobile Version (shows below temp on mobile) */}
+                  {/* Windsock - Mobile Version */}
                   <div className="windsock-mobile" style={{
                     marginTop: '1rem',
                     display: 'none'
@@ -794,20 +801,15 @@ script.onload = () => {
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1a1f3a' }}>
                     {(() => {
                       try {
-                        // sunrise is UTC timestamp - create date and format in location's local time
                         const date = new Date(weather.sys.sunrise * 1000);
                         const offsetMinutes = (weather.timezone || 0) / 60;
-                        
-                        // Get UTC time and add the location's offset
                         const utcHours = date.getUTCHours();
                         const utcMinutes = date.getUTCMinutes();
                         const totalMinutes = utcHours * 60 + utcMinutes + offsetMinutes;
-                        
                         let hours = Math.floor(totalMinutes / 60) % 24;
                         const minutes = totalMinutes % 60;
                         const ampm = hours >= 12 ? 'PM' : 'AM';
                         hours = hours % 12 || 12;
-                        
                         return `${hours}:${Math.abs(minutes).toString().padStart(2, '0')} ${ampm}`;
                       } catch (e) {
                         return '--:--';
@@ -829,16 +831,13 @@ script.onload = () => {
                       try {
                         const date = new Date(weather.sys.sunset * 1000);
                         const offsetMinutes = (weather.timezone || 0) / 60;
-                        
                         const utcHours = date.getUTCHours();
                         const utcMinutes = date.getUTCMinutes();
                         const totalMinutes = utcHours * 60 + utcMinutes + offsetMinutes;
-                        
                         let hours = Math.floor(totalMinutes / 60) % 24;
                         const minutes = totalMinutes % 60;
                         const ampm = hours >= 12 ? 'PM' : 'AM';
                         hours = hours % 12 || 12;
-                        
                         return `${hours}:${Math.abs(minutes).toString().padStart(2, '0')} ${ampm}`;
                       } catch (e) {
                         return '--:--';
@@ -849,7 +848,7 @@ script.onload = () => {
               </div>
             </div>
 
-            {/* Map Component - Full Width Below - Grid item 3 */}
+            {/* Map Component - Full Width Below */}
             <div style={{
               gridColumn: '1 / 4',
               background: 'rgba(255, 255, 255, 0.95)',
@@ -880,7 +879,6 @@ script.onload = () => {
                   position: 'relative'
                 }}
               >
-                {/* Map will be rendered here via Leaflet */}
                 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
                 <div style={{ 
                   width: '100%', 
@@ -925,7 +923,6 @@ script.onload = () => {
       </div>
 
       <style>{`
-        /* Animated Weather Icons */
         .weather-icon-animated {
           position: relative;
           display: flex;
@@ -935,10 +932,7 @@ script.onload = () => {
           height: 140px;
         }
 
-        /* Sun Animation */
-        .sun {
-          position: relative;
-        }
+        .sun { position: relative; }
         .sun-core {
           font-size: 5rem;
           animation: sunPulse 3s ease-in-out infinite;
@@ -970,132 +964,60 @@ script.onload = () => {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.05); }
         }
-
         @keyframes sunRotate {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
 
-        /* Rain Animation */
-        .rain {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .rain-cloud {
-          font-size: 4.5rem;
-          margin-bottom: -15px;
-          z-index: 2;
-        }
-        .rain-drops {
-          display: flex;
-          gap: 15px;
-          animation: rainFall 1s ease-in-out infinite;
-        }
-        .rain-drops span {
-          font-size: 1.5rem;
-          animation: dropFall 1s ease-in-out infinite;
-        }
-        .rain-drops span:nth-child(2) {
-          animation-delay: 0.3s;
-        }
-        .rain-drops span:nth-child(3) {
-          animation-delay: 0.6s;
-        }
+        .rain { display: flex; flex-direction: column; align-items: center; }
+        .rain-cloud { font-size: 4.5rem; margin-bottom: -15px; z-index: 2; }
+        .rain-drops { display: flex; gap: 15px; animation: rainFall 1s ease-in-out infinite; }
+        .rain-drops span { font-size: 1.5rem; animation: dropFall 1s ease-in-out infinite; }
+        .rain-drops span:nth-child(2) { animation-delay: 0.3s; }
+        .rain-drops span:nth-child(3) { animation-delay: 0.6s; }
 
         @keyframes rainFall {
           0%, 100% { transform: translateY(0); opacity: 1; }
           50% { transform: translateY(10px); opacity: 0.7; }
         }
-
         @keyframes dropFall {
           0% { transform: translateY(-5px); opacity: 0; }
           50% { opacity: 1; }
           100% { transform: translateY(20px); opacity: 0; }
         }
 
-        /* Drizzle Animation */
-        .drizzle {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .drizzle-cloud {
-          font-size: 5rem;
-          margin-bottom: -10px;
-        }
-        .drizzle-drops {
-          display: flex;
-          gap: 20px;
-          animation: drizzleFall 1.5s ease-in-out infinite;
-        }
-        .drizzle-drops span {
-          font-size: 1.2rem;
-          animation: dropFall 1.5s ease-in-out infinite;
-        }
-        .drizzle-drops span:nth-child(2) {
-          animation-delay: 0.5s;
-        }
+        .drizzle { display: flex; flex-direction: column; align-items: center; }
+        .drizzle-cloud { font-size: 5rem; margin-bottom: -10px; }
+        .drizzle-drops { display: flex; gap: 20px; animation: drizzleFall 1.5s ease-in-out infinite; }
+        .drizzle-drops span { font-size: 1.2rem; animation: dropFall 1.5s ease-in-out infinite; }
+        .drizzle-drops span:nth-child(2) { animation-delay: 0.5s; }
 
         @keyframes drizzleFall {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(8px); }
         }
 
-        /* Thunderstorm Animation */
-        .thunderstorm {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .storm-cloud {
-          font-size: 5rem;
-          animation: stormShake 0.5s ease-in-out infinite;
-        }
-        .lightning {
-          font-size: 2rem;
-          margin-top: -15px;
-          animation: lightningFlash 2s ease-in-out infinite;
-        }
+        .thunderstorm { display: flex; flex-direction: column; align-items: center; }
+        .storm-cloud { font-size: 5rem; animation: stormShake 0.5s ease-in-out infinite; }
+        .lightning { font-size: 2rem; margin-top: -15px; animation: lightningFlash 2s ease-in-out infinite; }
 
         @keyframes stormShake {
           0%, 100% { transform: translateX(0); }
           25% { transform: translateX(-2px); }
           75% { transform: translateX(2px); }
         }
-
         @keyframes lightningFlash {
           0%, 90%, 100% { opacity: 0; }
           92%, 94% { opacity: 1; }
         }
 
-        /* Snow Animation */
-        .snow {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .snow-cloud {
-          font-size: 4.5rem;
-          margin-bottom: -10px;
-        }
-        .snowflakes {
-          display: flex;
-          gap: 12px;
-        }
-        .snowflakes span {
-          font-size: 1.5rem;
-          animation: snowFall 3s ease-in-out infinite;
-        }
-        .snowflakes span:nth-child(1) {
-          animation-delay: 0s;
-        }
-        .snowflakes span:nth-child(2) {
-          animation-delay: 1s;
-        }
-        .snowflakes span:nth-child(3) {
-          animation-delay: 2s;
-        }
+        .snow { display: flex; flex-direction: column; align-items: center; }
+        .snow-cloud { font-size: 4.5rem; margin-bottom: -10px; }
+        .snowflakes { display: flex; gap: 12px; }
+        .snowflakes span { font-size: 1.5rem; animation: snowFall 3s ease-in-out infinite; }
+        .snowflakes span:nth-child(1) { animation-delay: 0s; }
+        .snowflakes span:nth-child(2) { animation-delay: 1s; }
+        .snowflakes span:nth-child(3) { animation-delay: 2s; }
 
         @keyframes snowFall {
           0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
@@ -1103,37 +1025,24 @@ script.onload = () => {
           100% { transform: translateY(30px) rotate(360deg); opacity: 0; }
         }
 
-        /* Clouds Animation */
-        .clouds span {
-          animation: cloudFloat 4s ease-in-out infinite;
-        }
-
+        .clouds span { animation: cloudFloat 4s ease-in-out infinite; }
         @keyframes cloudFloat {
           0%, 100% { transform: translateX(0); }
           50% { transform: translateX(10px); }
         }
 
-        /* Mist/Fog Animation */
-        .mist span, .fog span {
-          animation: mistFloat 3s ease-in-out infinite;
-        }
-
+        .mist span, .fog span { animation: mistFloat 3s ease-in-out infinite; }
         @keyframes mistFloat {
           0%, 100% { opacity: 0.6; transform: translateX(0); }
           50% { opacity: 0.9; transform: translateX(5px); }
         }
 
-        /* Smoke/Dust Animation */
-        .smoke span, .dust span {
-          animation: smokeDrift 2s ease-in-out infinite;
-        }
-
+        .smoke span, .dust span { animation: smokeDrift 2s ease-in-out infinite; }
         @keyframes smokeDrift {
           0%, 100% { transform: translateX(0) scale(1); opacity: 0.7; }
           50% { transform: translateX(8px) scale(1.1); opacity: 1; }
         }
 
-        /* Windsock Styles - Realistic Physics-Based Design */
         .windsock {
           position: relative;
           width: 80px;
@@ -1143,8 +1052,6 @@ script.onload = () => {
           justify-content: center;
           margin: 0 auto;
         }
-
-        /* Vertical pole - centered */
         .windsock-pole {
           position: absolute;
           left: 50%;
@@ -1156,8 +1063,6 @@ script.onload = () => {
           border-radius: 2px;
           box-shadow: 2px 0 4px rgba(0,0,0,0.2);
         }
-
-        /* Ball on top of pole */
         .windsock-pole::before {
           content: '';
           position: absolute;
@@ -1170,8 +1075,6 @@ script.onload = () => {
           border-radius: 50%;
           box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
         }
-
-        /* Flag/sock - triangle shape pointing right, attached to top of pole */
         .windsock-cone {
           position: absolute;
           left: 50%;
@@ -1185,67 +1088,30 @@ script.onload = () => {
           transition: width 0.3s ease;
         }
 
-        /* Wind Speed Animations - From hanging down (calm) to horizontal (strong wind) */
-        
-        /* Calm: 0-2 m/s - Hangs straight down (90 degrees from horizontal) */
-        .wind-calm .windsock-cone {
-          width: 25px;
-          opacity: 0.6;
-          animation: windCalm 4s ease-in-out infinite;
-        }
+        .wind-calm .windsock-cone { width: 25px; opacity: 0.6; animation: windCalm 4s ease-in-out infinite; }
+        .wind-light .windsock-cone { width: 30px; opacity: 0.7; animation: windLight 2.5s ease-in-out infinite; }
+        .wind-moderate .windsock-cone { width: 35px; opacity: 0.85; animation: windModerate 1.8s ease-in-out infinite; }
+        .wind-strong .windsock-cone { width: 40px; opacity: 0.95; animation: windStrong 1.2s ease-in-out infinite; }
+        .wind-gale .windsock-cone { width: 45px; opacity: 1; animation: windGale 0.5s ease-in-out infinite; }
 
-        /* Light: 2-5 m/s - Lifts to about 45 degrees below horizontal */
-        .wind-light .windsock-cone {
-          width: 30px;
-          opacity: 0.7;
-          animation: windLight 2.5s ease-in-out infinite;
-        }
-
-        /* Moderate: 5-10 m/s - Nearly horizontal, slight dip (~15 degrees) */
-        .wind-moderate .windsock-cone {
-          width: 35px;
-          opacity: 0.85;
-          animation: windModerate 1.8s ease-in-out infinite;
-        }
-
-        /* Strong: 10-15 m/s - Fully horizontal with flutter */
-        .wind-strong .windsock-cone {
-          width: 40px;
-          opacity: 0.95;
-          animation: windStrong 1.2s ease-in-out infinite;
-        }
-
-        /* Gale: 15+ m/s - Fully extended horizontal with violent flutter */
-        .wind-gale .windsock-cone {
-          width: 45px;
-          opacity: 1;
-          animation: windGale 0.5s ease-in-out infinite;
-        }
-
-        /* Animations - Rotate from vertical (90deg) to horizontal (0deg) */
-        
         @keyframes windCalm {
           0%, 100% { transform: rotate(92deg) scaleY(0.85); }
           50% { transform: rotate(88deg) scaleY(0.9); }
         }
-
         @keyframes windLight {
           0%, 100% { transform: rotate(50deg) scaleY(0.9); }
           50% { transform: rotate(40deg) scaleY(0.95); }
         }
-
         @keyframes windModerate {
           0%, 100% { transform: rotate(18deg) scaleY(0.95); }
           50% { transform: rotate(12deg) scaleY(1); }
         }
-
         @keyframes windStrong {
           0%, 100% { transform: rotate(3deg) scaleY(1); }
           25% { transform: rotate(-2deg) scaleY(1.05); }
           50% { transform: rotate(3deg) scaleY(1); }
           75% { transform: rotate(-2deg) scaleY(1.05); }
         }
-
         @keyframes windGale {
           0% { transform: rotate(0deg) scaleY(1.05); }
           15% { transform: rotate(-5deg) scaleY(1.1); }
@@ -1257,130 +1123,47 @@ script.onload = () => {
           100% { transform: rotate(0deg) scaleY(1.05); }
         }
 
-        /* General Animations */
         @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-
         @keyframes pulse {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.6; }
         }
 
-        ::placeholder {
-          color: #9ca3af;
-          opacity: 0.6;
-        }
+        ::placeholder { color: #9ca3af; opacity: 0.6; }
 
-        /* Responsive Layout */
         @media (max-width: 1200px) {
-          .weather-layout {
-            grid-template-columns: 1fr 1fr !important;
-            grid-template-rows: auto auto auto !important;
-          }
-          .weather-layout > div:first-child {
-            grid-column: 1 / 3 !important;
-            grid-row: 1 !important;
-          }
-          .weather-layout > div:nth-child(2) {
-            grid-column: 1 / 3 !important;
-            grid-row: 2 !important;
-          }
-          .weather-layout > div:nth-child(3) {
-            grid-column: 1 / 3 !important;
-            grid-row: 3 !important;
-          }
+          .weather-layout { grid-template-columns: 1fr 1fr !important; grid-template-rows: auto auto auto !important; }
+          .weather-layout > div:first-child { grid-column: 1 / 3 !important; grid-row: 1 !important; }
+          .weather-layout > div:nth-child(2) { grid-column: 1 / 3 !important; grid-row: 2 !important; }
+          .weather-layout > div:nth-child(3) { grid-column: 1 / 3 !important; grid-row: 3 !important; }
         }
-
         @media (max-width: 768px) {
-          .weather-layout {
-            grid-template-columns: 1fr !important;
-          }
-          .weather-layout > div {
-            grid-column: 1 !important;
-          }
-          h1 {
-            font-size: 1.4rem !important;
-          }
-          
-          /* Center location name on mobile */
-          .location-name {
-            text-align: center !important;
-          }
-          
-          /* Switch to single column layout on mobile */
-          .temp-display-container {
-            grid-template-columns: 1fr !important;
-          }
-          
-          /* Hide desktop windsock, show mobile version */
-          .windsock-desktop {
-            display: none !important;
-          }
-          .windsock-mobile {
-            display: block !important;
-          }
-          
-          /* Reduce temperature font size on mobile */
-          .temp-display-container > div:nth-child(1) > div:first-child {
-            font-size: 3.5rem !important;
-          }
-          .temp-display-container > div:nth-child(1) > div:nth-child(2) {
-            font-size: 1rem !important;
-          }
-
-          /* Map height on mobile */
-          #weather-map {
-            height: 400px !important;
-          }
+          .weather-layout { grid-template-columns: 1fr !important; }
+          .weather-layout > div { grid-column: 1 !important; }
+          h1 { font-size: 1.4rem !important; }
+          .location-name { text-align: center !important; }
+          .temp-display-container { grid-template-columns: 1fr !important; }
+          .windsock-desktop { display: none !important; }
+          .windsock-mobile { display: block !important; }
+          .temp-display-container > div:nth-child(1) > div:first-child { font-size: 3.5rem !important; }
+          .temp-display-container > div:nth-child(1) > div:nth-child(2) { font-size: 1rem !important; }
+          #weather-map { height: 400px !important; }
         }
-
         @media (max-width: 480px) {
-          h1 {
-            font-size: 1.2rem !important;
-          }
-          .weather-icon-animated {
-            width: 100px !important;
-            height: 100px !important;
-          }
-          .sun-core, .rain-cloud, .drizzle-cloud, .storm-cloud, .clouds span {
-            font-size: 3.5rem !important;
-          }
-          
-          /* Further reduce temperature on small mobile */
-          .temp-display-container > div:nth-child(1) > div:first-child {
-            font-size: 3rem !important;
-          }
-          .temp-display-container > div:nth-child(1) > div:nth-child(2) {
-            font-size: 0.9rem !important;
-          }
+          h1 { font-size: 1.2rem !important; }
+          .weather-icon-animated { width: 100px !important; height: 100px !important; }
+          .sun-core, .rain-cloud, .drizzle-cloud, .storm-cloud, .clouds span { font-size: 3.5rem !important; }
+          .temp-display-container > div:nth-child(1) > div:first-child { font-size: 3rem !important; }
+          .temp-display-container > div:nth-child(1) > div:nth-child(2) { font-size: 0.9rem !important; }
         }
 
-        /* Smooth scrolling */
-        * {
-          scrollbar-width: thin;
-          scrollbar-color: ${hexToRgba(themeColor, 0.3)} transparent;
-        }
-        
-        *::-webkit-scrollbar {
-          width: 8px;
-        }
-        
-        *::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        
-        *::-webkit-scrollbar-thumb {
-          background-color: ${hexToRgba(themeColor, 0.3)};
-          border-radius: 4px;
-        }
+        * { scrollbar-width: thin; scrollbar-color: ${hexToRgba(themeColor, 0.3)} transparent; }
+        *::-webkit-scrollbar { width: 8px; }
+        *::-webkit-scrollbar-track { background: transparent; }
+        *::-webkit-scrollbar-thumb { background-color: ${hexToRgba(themeColor, 0.3)}; border-radius: 4px; }
       `}</style>
     </div>
   );
