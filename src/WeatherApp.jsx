@@ -53,16 +53,16 @@ script.onload = () => {
       attributionControl: true
     }).setView([lat, lon], 10);
 
-    // ──────────── Capas de mapa ────────────
+    // ──────────── Capas Base ────────────
     const layers = {};
 
-    // 1. OpenStreetMap Standard
+    // 1. OpenStreetMap
     layers['OSM'] = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
       maxZoom: 19
-    }).addTo(map);
+    });
 
-    // 2. CartoDB Positron
+    // 2. CartoDB Positron (default)
     layers['CartoDB Positron'] = window.L.tileLayer(
       'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       {
@@ -70,18 +70,9 @@ script.onload = () => {
         subdomains: 'abcd',
         maxZoom: 19
       }
-    );
+    ).addTo(map);
 
-    // 3. Stamen Toner Lite
-    layers['Stamen Toner Lite'] = window.L.tileLayer(
-      'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png',
-      {
-        attribution: 'Map tiles by Stamen Design, © OpenStreetMap',
-        maxZoom: 20
-      }
-    );
-
-    // 4. Mapbox (requires API key)
+    // 3. Mapbox (opcional, requiere API key)
     if (process.env.REACT_APP_MAPBOX_API_KEY) {
       layers['Mapbox Streets'] = window.L.tileLayer(
         `https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${process.env.REACT_APP_MAPBOX_API_KEY}`,
@@ -94,10 +85,28 @@ script.onload = () => {
       );
     }
 
-    // Añadir control de capas
-    window.L.control.layers(layers, null, { collapsed: false, position: 'topright' }).addTo(map);
+    // ──────────── Overlays de Clima ────────────
+    const overlays = {};
 
-    // Marcador principal
+    overlays['Nubes'] = window.L.tileLayer(
+      `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${process.env.REACT_APP_OWM_KEY}`,
+      { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
+    );
+
+    overlays['Lluvia'] = window.L.tileLayer(
+      `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${process.env.REACT_APP_OWM_KEY}`,
+      { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
+    );
+
+    overlays['Viento'] = window.L.tileLayer(
+      `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${process.env.REACT_APP_OWM_KEY}`,
+      { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
+    );
+
+    // Añadir control de capas (base + overlays)
+    window.L.control.layers(layers, overlays, { collapsed: false, position: 'topright' }).addTo(map);
+
+    // ──────────── Marcador principal ────────────
     const marker = window.L.marker([lat, lon], {
       icon: window.L.divIcon({
         className: 'custom-marker',
@@ -132,6 +141,7 @@ script.onload = () => {
     mapContainer._leafletMap = map;
   }, 100);
 };
+
 
 
 
