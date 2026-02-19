@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 // Layout: 2/4 main weather (left) | 1/4 metrics (top right) | 1/4 sun data (bottom right)
 
 const WeatherApp = () => {
+   console.log("OWM Key:", process.env.REACT_APP_OWM_KEY);
   const [weather, setWeather] = useState(null);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
