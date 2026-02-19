@@ -44,26 +44,60 @@ script.onload = () => {
       mapContainer._leafletMap.remove();
     }
 
-    // Asegúrate de que el contenedor tenga altura (CSS)
-    // <div id="weather-map" style="width: 100%; height: 400px;"></div>
-
-    // Coordenadas
     const lat = weather.coord?.lat || 0;
     const lon = weather.coord?.lon || 0;
 
-    // Inicializar mapa directamente en el contenedor
+    // Inicializar mapa
     const map = window.L.map(mapContainer, {
       zoomControl: true,
       attributionControl: true
     }).setView([lat, lon], 10);
 
-    // Agregar tiles de OpenStreetMap
-    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // ──────────── Capas de mapa ────────────
+    const layers = {};
+
+    // 1. OpenStreetMap Standard
+    layers['OSM'] = window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
-      maxZoom: 18
+      maxZoom: 19
     }).addTo(map);
 
-    // Agregar marcador personalizado
+    // 2. CartoDB Positron
+    layers['CartoDB Positron'] = window.L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      {
+        attribution: '© OpenStreetMap © CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }
+    );
+
+    // 3. Stamen Toner Lite
+    layers['Stamen Toner Lite'] = window.L.tileLayer(
+      'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png',
+      {
+        attribution: 'Map tiles by Stamen Design, © OpenStreetMap',
+        maxZoom: 20
+      }
+    );
+
+    // 4. Mapbox (requires API key)
+    if (process.env.REACT_APP_MAPBOX_API_KEY) {
+      layers['Mapbox Streets'] = window.L.tileLayer(
+        `https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/{z}/{x}/{y}?access_token=${process.env.REACT_APP_MAPBOX_API_KEY}`,
+        {
+          attribution: '© Mapbox © OpenStreetMap',
+          tileSize: 512,
+          zoomOffset: -1,
+          maxZoom: 20
+        }
+      );
+    }
+
+    // Añadir control de capas
+    window.L.control.layers(layers, null, { collapsed: false, position: 'topright' }).addTo(map);
+
+    // Marcador principal
     const marker = window.L.marker([lat, lon], {
       icon: window.L.divIcon({
         className: 'custom-marker',
@@ -94,10 +128,11 @@ script.onload = () => {
     // Forzar recalculo si el contenedor cambia de tamaño
     setTimeout(() => map.invalidateSize(), 50);
 
-    // Guardar referencia para limpiar luego
+    // Guardar referencia para limpieza
     mapContainer._leafletMap = map;
   }, 100);
 };
+
 
 
     document.head.appendChild(script);
