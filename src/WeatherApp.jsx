@@ -1292,7 +1292,7 @@ script.onload = () => {
 
           /* Map height on mobile */
           #weather-map {
-            height: 300px !important;
+            height: 400px !important;
           }
         }
 
