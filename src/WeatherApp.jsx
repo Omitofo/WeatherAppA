@@ -6,6 +6,9 @@ import React, { useState, useEffect } from 'react';
 
 const WeatherApp = () => {
    console.log("OWM Key:", process.env.REACT_APP_OWM_KEY);
+   useEffect(() => {
+  console.log("OWM ENV TEST:", process.env.REACT_APP_OWM_KEY);
+}, []);
   const [weather, setWeather] = useState(null);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
