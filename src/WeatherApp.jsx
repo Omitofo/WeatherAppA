@@ -5,10 +5,7 @@ import React, { useState, useEffect } from 'react';
 // Layout: 2/4 main weather (left) | 1/4 metrics (top right) | 1/4 sun data (bottom right)
 
 const WeatherApp = () => {
-   console.log("OWM Key:", process.env.REACT_APP_OWM_KEY);
-   useEffect(() => {
-  console.log("OWM ENV TEST:", process.env.REACT_APP_OWM_KEY);
-}, []);
+
   const [weather, setWeather] = useState(null);
   const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
@@ -93,17 +90,17 @@ script.onload = () => {
     const overlays = {};
 
     overlays['Nubes'] = window.L.tileLayer(
-      `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${process.env.REACT_APP_OWM_KEY}`,
+      `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${process.env.VITE_OWM_KEY}`,
       { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
     );
 
     overlays['Lluvia'] = window.L.tileLayer(
-      `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${process.env.REACT_APP_OWM_KEY}`,
+      `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${process.env.VITE_OWM_KEY}`,
       { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
     );
 
     overlays['Viento'] = window.L.tileLayer(
-      `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${process.env.REACT_APP_OWM_KEY}`,
+      `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${process.env.VITE_OWM_KEY}`,
       { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.5 }
     );
 
