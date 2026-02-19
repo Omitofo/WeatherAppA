@@ -34,68 +34,71 @@ const WeatherApp = () => {
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
     script.async = true;
     
-    script.onload = () => {
-      // Wait a bit for DOM to be ready
-      setTimeout(() => {
-        const mapContainer = document.getElementById('weather-map');
-        if (!mapContainer || !window.L) return;
+script.onload = () => {
+  setTimeout(() => {
+    const mapContainer = document.getElementById('weather-map');
+    if (!mapContainer || !window.L) return;
 
-        // Clear existing map if any
-        mapContainer.innerHTML = '';
-        const mapDiv = document.createElement('div');
-        mapDiv.style.width = '100%';
-        mapDiv.style.height = '100%';
-        mapContainer.appendChild(mapDiv);
+    // Limpiar mapa anterior si existe
+    if (mapContainer._leafletMap) {
+      mapContainer._leafletMap.remove();
+    }
 
-        // Get coordinates (OpenWeatherMap API should provide coord data)
-        // For now, we'll use a geocoding approximation or require coord in API
-        const lat = weather.coord?.lat || 0;
-        const lon = weather.coord?.lon || 0;
+    // Asegúrate de que el contenedor tenga altura (CSS)
+    // <div id="weather-map" style="width: 100%; height: 400px;"></div>
 
-        // Initialize map
-        const map = window.L.map(mapDiv, {
-          zoomControl: true,
-          attributionControl: true
-        }).setView([lat, lon], 10);
+    // Coordenadas
+    const lat = weather.coord?.lat || 0;
+    const lon = weather.coord?.lon || 0;
 
-        // Add OpenStreetMap tiles
-        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors',
-          maxZoom: 18
-        }).addTo(map);
+    // Inicializar mapa directamente en el contenedor
+    const map = window.L.map(mapContainer, {
+      zoomControl: true,
+      attributionControl: true
+    }).setView([lat, lon], 10);
 
-        // Add marker for the city
-        const marker = window.L.marker([lat, lon], {
-          icon: window.L.divIcon({
-            className: 'custom-marker',
-            html: `<div style="
-              background: ${themeColor};
-              width: 30px;
-              height: 30px;
-              border-radius: 50%;
-              border: 3px solid white;
-              box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 16px;
-            ">📍</div>`,
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-          })
-        }).addTo(map);
+    // Agregar tiles de OpenStreetMap
+    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 18
+    }).addTo(map);
 
-        marker.bindPopup(`
-          <div style="font-family: 'Courier New', monospace; padding: 8px;">
-            <strong>${weather.name}, ${weather.sys.country}</strong><br/>
-            ${Math.round(weather.main.temp)}°C - ${weather.weather[0].description}
-          </div>
-        `).openPopup();
+    // Agregar marcador personalizado
+    const marker = window.L.marker([lat, lon], {
+      icon: window.L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="
+          background: ${themeColor};
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+        ">📍</div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      })
+    }).addTo(map);
 
-        // Store map instance for cleanup
-        mapContainer._leafletMap = map;
-      }, 100);
-    };
+    marker.bindPopup(`
+      <div style="font-family: 'Courier New', monospace; padding: 8px;">
+        <strong>${weather.name}, ${weather.sys.country}</strong><br/>
+        ${Math.round(weather.main.temp)}°C - ${weather.weather[0].description}
+      </div>
+    `).openPopup();
+
+    // Forzar recalculo si el contenedor cambia de tamaño
+    setTimeout(() => map.invalidateSize(), 50);
+
+    // Guardar referencia para limpiar luego
+    mapContainer._leafletMap = map;
+  }, 100);
+};
+
 
     document.head.appendChild(script);
 
