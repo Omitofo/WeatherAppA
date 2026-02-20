@@ -343,7 +343,7 @@ const WeatherApp = () => {
               onFocus={(e) => { e.target.style.borderColor = themeColor; e.target.style.boxShadow = `0 0 0 3px ${hexToRgba(themeColor, 0.1)}`; }}
               onBlur={(e) => { e.target.style.borderColor = hexToRgba(themeColor, 0.3); e.target.style.boxShadow = 'none'; }}
             />
-            <button onClick={searchWeather} disabled={loading}
+            <button onClick={searchWeather} disabled={loading} className="search-btn"
               style={{ background: themeColor, border: 'none', color: 'white', padding: '0.75rem 1.75rem', fontFamily: 'inherit', fontSize: '1rem', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', borderRadius: '8px', transition: 'all 0.2s ease', opacity: loading ? 0.6 : 1, boxShadow: `0 4px 12px ${hexToRgba(themeColor, 0.3)}`, minWidth: '130px' }}
               onMouseEnter={(e) => { if (!loading) { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = `0 6px 16px ${hexToRgba(themeColor, 0.4)}`; } }}
               onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = `0 4px 12px ${hexToRgba(themeColor, 0.3)}`; }}
@@ -616,6 +616,7 @@ const WeatherApp = () => {
           .windsock-desktop { display: none !important; }
           .windsock-mobile { display: block !important; }
           #weather-map { height: 400px !important; }
+          .search-btn { width: 100% !important; }
         }
         @media (max-width: 480px) {
           h1 { font-size: 1.2rem !important; }
