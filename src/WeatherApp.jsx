@@ -37,17 +37,27 @@ const WeatherApp = () => {
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
-
-  // Switch base layer imperatively when React state changes
+  }, []);  // Switch base layer — re-applies active overlays on top so they persist
   useEffect(() => {
     const mapContainer = document.getElementById('weather-map');
     const map = mapContainer?._leafletMap;
     if (!map || !map._baseLayers) return;
+
+    // Swap base layer
     Object.entries(map._baseLayers).forEach(([id, layer]) => {
       if (id === activeBaseLayer) { if (!map.hasLayer(layer)) map.addLayer(layer); }
       else { if (map.hasLayer(layer)) map.removeLayer(layer); }
     });
+
+    // Re-stamp active overlays on top of the new base (remove+add to guarantee z-order)
+    if (map._overlayLayers) {
+      Object.entries(map._overlayLayers).forEach(([id, layer]) => {
+        if (activeOverlays.includes(id)) {
+          map.removeLayer(layer);
+          map.addLayer(layer);
+        }
+      });
+    }
   }, [activeBaseLayer]);
 
   // Toggle overlays imperatively when React state changes
