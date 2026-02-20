@@ -79,7 +79,7 @@ const WeatherApp = () => {
       const map = window.L.map(mapContainer, {
         zoomControl: true,
         attributionControl: true
-      }).setView([lat, lon], 3);
+      }).setView([lat, lon], 4);
 
       // ──────────── Base Layers ────────────
       const baseLayers = {
@@ -109,29 +109,25 @@ const WeatherApp = () => {
       baseLayers[activeBaseLayer]?.addTo(map);
       map._baseLayers = baseLayers;
 
-      // ──────────── Weather Overlays ────────────
-      const owmKey = import.meta.env.VITE_OWM_KEY;
-      console.log('OWM KEY resolved:', owmKey ? '✅ found' : '❌ undefined — overlays disabled');
-
-      const overlayLayers = {};
-      if (owmKey) {
-        overlayLayers['Precipitation'] = window.L.tileLayer(
-          `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${owmKey}`,
+      // ──────────── Weather Overlays (proxied via /api/tiles — works globally) ────────────
+      const overlayLayers = {
+        'Precipitation': window.L.tileLayer(
+          '/api/tiles?layer=precipitation_new&z={z}&x={x}&y={y}',
           { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
-        );
-        overlayLayers['Clouds'] = window.L.tileLayer(
-          `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${owmKey}`,
+        ),
+        'Clouds': window.L.tileLayer(
+          '/api/tiles?layer=clouds_new&z={z}&x={x}&y={y}',
           { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
-        );
-        overlayLayers['Wind'] = window.L.tileLayer(
-          `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${owmKey}`,
+        ),
+        'Wind': window.L.tileLayer(
+          '/api/tiles?layer=wind_new&z={z}&x={x}&y={y}',
           { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
-        );
-        overlayLayers['Temperature'] = window.L.tileLayer(
-          `https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${owmKey}`,
+        ),
+        'Temperature': window.L.tileLayer(
+          '/api/tiles?layer=temp_new&z={z}&x={x}&y={y}',
           { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
-        );
-      }
+        ),
+      };
       // Add any already-active overlays (e.g. after themeColor re-init)
       activeOverlays.forEach(id => overlayLayers[id]?.addTo(map));
       map._overlayLayers = overlayLayers;
