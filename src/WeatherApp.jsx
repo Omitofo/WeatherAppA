@@ -1,5 +1,4 @@
 //src/WeatherApp.jsx
-//src/WeatherApp.jsx
 import React, { useState, useEffect } from 'react';
 
 const WeatherApp = () => {
@@ -9,6 +8,23 @@ const WeatherApp = () => {
   const [error, setError] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [themeColor, setThemeColor] = useState('#00ff41');
+  const [activeBaseLayer, setActiveBaseLayer] = useState('CartoDB Light');
+  const [activeOverlays, setActiveOverlays] = useState([]);
+
+  const BASE_LAYERS = [
+    { id: 'CartoDB Light', label: 'Light' },
+    { id: 'CartoDB Dark', label: 'Dark' },
+    { id: 'OpenStreetMap', label: 'Streets' },
+    { id: 'Satellite', label: '🛰 Sat' },
+    { id: 'Topo', label: '🗺 Topo' },
+  ];
+
+  const OVERLAY_LAYERS = [
+    { id: 'Precipitation', label: '🌧 Rain' },
+    { id: 'Clouds', label: '☁️ Clouds' },
+    { id: 'Wind', label: '💨 Wind' },
+    { id: 'Temperature', label: '🌡 Temp' },
+  ];
 
   const colorThemes = [
     { name: 'NEON', color: '#00ff41', label: 'GRN' },
@@ -22,6 +38,28 @@ const WeatherApp = () => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Switch base layer imperatively when React state changes
+  useEffect(() => {
+    const mapContainer = document.getElementById('weather-map');
+    const map = mapContainer?._leafletMap;
+    if (!map || !map._baseLayers) return;
+    Object.entries(map._baseLayers).forEach(([id, layer]) => {
+      if (id === activeBaseLayer) { if (!map.hasLayer(layer)) map.addLayer(layer); }
+      else { if (map.hasLayer(layer)) map.removeLayer(layer); }
+    });
+  }, [activeBaseLayer]);
+
+  // Toggle overlays imperatively when React state changes
+  useEffect(() => {
+    const mapContainer = document.getElementById('weather-map');
+    const map = mapContainer?._leafletMap;
+    if (!map || !map._overlayLayers) return;
+    Object.entries(map._overlayLayers).forEach(([id, layer]) => {
+      if (activeOverlays.includes(id)) { if (!map.hasLayer(layer)) map.addLayer(layer); }
+      else { if (map.hasLayer(layer)) map.removeLayer(layer); }
+    });
+  }, [activeOverlays]);
 
   useEffect(() => {
     if (!weather) return;
@@ -43,109 +81,84 @@ const WeatherApp = () => {
         attributionControl: true
       }).setView([lat, lon], 10);
 
-      // ──────────── Base Layers (all 100% free, no account needed) ────────────
-      const layers = {};
+      // ──────────── Base Layers ────────────
+      const baseLayers = {
+        'CartoDB Light': window.L.tileLayer(
+          'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+          { attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19 }
+        ),
+        'CartoDB Dark': window.L.tileLayer(
+          'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+          { attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19 }
+        ),
+        'OpenStreetMap': window.L.tileLayer(
+          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          { attribution: '© OpenStreetMap contributors', maxZoom: 19 }
+        ),
+        'Satellite': window.L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          { attribution: '© Esri, Maxar, Earthstar Geographics', maxZoom: 19 }
+        ),
+        'Topo': window.L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+          { attribution: '© Esri, HERE, © OpenStreetMap contributors', maxZoom: 19 }
+        ),
+      };
 
-      // 1. CartoDB Light (default — clean, minimal)
-      layers['CartoDB Light'] = window.L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19
-        }
-      ).addTo(map);
+      // Add the active base layer on init
+      baseLayers[activeBaseLayer]?.addTo(map);
+      map._baseLayers = baseLayers;
 
-      // 2. CartoDB Dark (pairs great with neon themes!)
-      layers['CartoDB Dark'] = window.L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 19
-        }
-      );
-
-      // 3. OpenStreetMap (standard)
-      layers['OpenStreetMap'] = window.L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          maxZoom: 19
-        }
-      );
-
-      // 4. Esri Satellite (free, no account, beautiful aerial imagery)
-      layers['🛰 Satellite'] = window.L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        {
-          attribution: '© <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics',
-          maxZoom: 19
-        }
-      );
-
-      // 5. Esri Topo (terrain + labels, great for geography context)
-      layers['🗺 Topo'] = window.L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-        {
-          attribution: '© <a href="https://www.esri.com/">Esri</a>, HERE, Garmin, © OpenStreetMap contributors',
-          maxZoom: 19
-        }
-      );
-
-      // ──────────── Weather Overlays (OWM tiles) ────────────
+      // ──────────── Weather Overlays ────────────
       const owmKey = import.meta.env.VITE_OWM_KEY;
       console.log('OWM KEY resolved:', owmKey ? '✅ found' : '❌ undefined — overlays disabled');
 
-      const overlays = {};
-
+      const overlayLayers = {};
       if (owmKey) {
-        overlays['🌧 Precipitation'] = window.L.tileLayer(
+        overlayLayers['Precipitation'] = window.L.tileLayer(
           `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${owmKey}`,
           { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
         );
-        overlays['☁️ Clouds'] = window.L.tileLayer(
+        overlayLayers['Clouds'] = window.L.tileLayer(
           `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${owmKey}`,
           { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
         );
-        overlays['💨 Wind'] = window.L.tileLayer(
+        overlayLayers['Wind'] = window.L.tileLayer(
           `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${owmKey}`,
           { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
         );
-        overlays['🌡 Temperature'] = window.L.tileLayer(
+        overlayLayers['Temperature'] = window.L.tileLayer(
           `https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${owmKey}`,
           { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
         );
       }
+      // Add any already-active overlays (e.g. after themeColor re-init)
+      activeOverlays.forEach(id => overlayLayers[id]?.addTo(map));
+      map._overlayLayers = overlayLayers;
 
-      window.L.control.layers(layers, overlays, { collapsed: false, position: 'topright' }).addTo(map);
-
-      const marker = window.L.marker([lat, lon], {
+      // ──────────── Marker — clean dot only, no default pin ────────────
+      window.L.marker([lat, lon], {
         icon: window.L.divIcon({
-          className: 'custom-marker',
+          className: '',  // empty className removes Leaflet's default white box
           html: `<div style="
-            background: ${themeColor};
-            width: 30px;
-            height: 30px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
+            background: ${themeColor};
             border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-          ">📍</div>`,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15]
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+          "></div>`,
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
+          popupAnchor: [0, -12]
         })
-      }).addTo(map);
-
-      marker.bindPopup(`
-        <div style="font-family: 'Courier New', monospace; padding: 8px;">
-          <strong>${weather.name}, ${weather.sys.country}</strong><br/>
-          ${Math.round(weather.main.temp)}°C - ${weather.weather[0].description}
-        </div>
-      `).openPopup();
+      }).addTo(map)
+        .bindPopup(`
+          <div style="font-family:'Courier New',monospace; padding:6px; font-size:0.85rem;">
+            <strong>${weather.name}, ${weather.sys.country}</strong><br/>
+            ${Math.round(weather.main.temp)}°C — ${weather.weather[0].description}
+          </div>
+        `).openPopup();
 
       setTimeout(() => map.invalidateSize(), 50);
       mapContainer._leafletMap = map;
@@ -438,9 +451,76 @@ const WeatherApp = () => {
               {/* Map */}
               <div style={{ gridColumn: '1 / 4', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '1.25rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', border: `2px solid ${hexToRgba(themeColor, 0.2)}`, overflow: 'hidden' }}>
                 <div style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1rem', fontWeight: '600' }}>{'>'} LOCATION MAP</div>
+
+                {/* Map canvas */}
                 <div id="weather-map" style={{ width: '100%', height: '400px', borderRadius: '12px', overflow: 'hidden', border: `1px solid ${hexToRgba(themeColor, 0.2)}`, position: 'relative' }}>
                   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
                   <div style={{ width: '100%', height: '100%', background: '#f8f9fa' }} />
+                </div>
+
+                {/* ── Custom layer controls (below map, mobile-safe) ── */}
+                <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+
+                  {/* Base layer row */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: '700', letterSpacing: '0.05em', minWidth: '50px' }}>MAP</span>
+                    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                      {BASE_LAYERS.map(({ id, label }) => {
+                        const isActive = activeBaseLayer === id;
+                        return (
+                          <button key={id} onClick={() => setActiveBaseLayer(id)} style={{
+                            padding: '0.3rem 0.75rem',
+                            borderRadius: '999px',
+                            border: `1.5px solid ${isActive ? themeColor : hexToRgba(themeColor, 0.25)}`,
+                            background: isActive ? themeColor : 'transparent',
+                            color: isActive ? 'white' : '#4b5563',
+                            fontSize: '0.75rem',
+                            fontFamily: 'inherit',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            boxShadow: isActive ? `0 2px 8px ${hexToRgba(themeColor, 0.35)}` : 'none',
+                          }}>
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Overlay toggle row */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#9ca3af', fontWeight: '700', letterSpacing: '0.05em', minWidth: '50px' }}>LAYERS</span>
+                    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                      {OVERLAY_LAYERS.map(({ id, label }) => {
+                        const isOn = activeOverlays.includes(id);
+                        return (
+                          <button key={id} onClick={() => {
+                            setActiveOverlays(prev =>
+                              isOn ? prev.filter(x => x !== id) : [...prev, id]
+                            );
+                          }} style={{
+                            padding: '0.3rem 0.75rem',
+                            borderRadius: '999px',
+                            border: `1.5px solid ${isOn ? themeColor : hexToRgba(themeColor, 0.25)}`,
+                            background: isOn ? hexToRgba(themeColor, 0.12) : 'transparent',
+                            color: isOn ? themeColor : '#4b5563',
+                            fontSize: '0.75rem',
+                            fontFamily: 'inherit',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                            boxShadow: isOn ? `0 0 0 1px ${hexToRgba(themeColor, 0.2)}` : 'none',
+                          }}>
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
