@@ -79,7 +79,7 @@ const WeatherApp = () => {
       const map = window.L.map(mapContainer, {
         zoomControl: true,
         attributionControl: true
-      }).setView([lat, lon], 4);
+      }).setView([lat, lon], 2);
 
       // ──────────── Base Layers ────────────
       const baseLayers = {
