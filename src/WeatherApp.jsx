@@ -167,22 +167,25 @@ const WeatherApp = () => {
       map._baseLayers = baseLayers;
 
       // ── Weather Overlays ─────────────────────────────────────────────────
+      // Opacity tuned per-layer: precipitation/wind are already vivid at 0.85,
+      // clouds need a boost to 0.9 to show clearly over light base maps,
+      // temperature is the most colourful layer so 0.85 keeps it readable.
       const overlayLayers = {
         'Precipitation': window.L.tileLayer(
           '/api/tiles?layer=precipitation_new&z={z}&x={x}&y={y}',
-          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
+          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.85 }
         ),
         'Clouds': window.L.tileLayer(
           '/api/tiles?layer=clouds_new&z={z}&x={x}&y={y}',
-          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
+          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.9 }
         ),
         'Wind': window.L.tileLayer(
           '/api/tiles?layer=wind_new&z={z}&x={x}&y={y}',
-          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
+          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.85 }
         ),
         'Temperature': window.L.tileLayer(
           '/api/tiles?layer=temp_new&z={z}&x={x}&y={y}',
-          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.6 }
+          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.85 }
         ),
       };
 
