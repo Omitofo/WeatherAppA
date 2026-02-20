@@ -173,19 +173,19 @@ const WeatherApp = () => {
       const overlayLayers = {
         'Precipitation': window.L.tileLayer(
           '/api/tiles?layer=precipitation_new&z={z}&x={x}&y={y}',
-          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.85 }
+          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.95 }
         ),
         'Clouds': window.L.tileLayer(
           '/api/tiles?layer=clouds_new&z={z}&x={x}&y={y}',
-          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.9 }
+          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.95 }
         ),
         'Wind': window.L.tileLayer(
           '/api/tiles?layer=wind_new&z={z}&x={x}&y={y}',
-          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.85 }
+          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.95 }
         ),
         'Temperature': window.L.tileLayer(
           '/api/tiles?layer=temp_new&z={z}&x={x}&y={y}',
-          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.85 }
+          { attribution: '© OpenWeatherMap', maxZoom: 19, opacity: 0.95 }
         ),
       };
 
